@@ -1,0 +1,260 @@
+gene	disease_summary	cancer_relevance	inheritance	phenotype_group	omim_gene_id
+KIF1B	pheochromocytoma	moderate	AD		605995
+MAD2L2	Fanconi anemia	low	AR		604946
+SDHB	pheochromocytoma/paraganglioma syndrome 4 / hereditary pheochromocytoma-paraganglioma / mitochondrial disease	high	AD		185470
+PADI6	preimplantation embryonic lethality 2	high	AR		615709
+RPL11	Diamond-Blackfan anemia 7	high	AD		604175
+CSF3R	autosomal recessive severe congenital neutropenia due to CSF3R deficiency / hereditary neutrophilia	high	AR		138971
+MPL	thrombocythemia 2 / congenital amegakaryocytic thrombocytopenia / congenital amegakaryocytic thrombocytopenia 1	high	AD		159530
+UROD	UROD-related inherited porphyria	high	AD/AR		613521
+MUTYH	familial adenomatous polyposis 2	high	AR		604933
+GFI1	neutropenia, severe congenital, 2, autosomal dominant	high	AD		600871
+RPL5	Diamond-Blackfan anemia 6	high	AD		603634
+DPYD	dihydropyrimidine dehydrogenase deficiency	high	AR		612779
+NRAS	Noonan syndrome / Noonan syndrome 6	high	AD		164790
+RPS27	Diamond-Blackfan anemia 17	low	Unknown		603702
+HAX1	Kostmann syndrome	high	AR		605998
+GBA1	Gaucher disease / Parkinson disease / Gaucher disease perinatal lethal	high	AR		606463
+SDHC	hereditary pheochromocytoma-paraganglioma / pheochromocytoma/paraganglioma syndrome 3	high	AD		602413
+GPR161	medulloblastoma / GPR161-related medulloblastoma predisposition	high	AD		612250
+CDC73	hyperparathyroidism 2 with jaw tumors	high	AD		607393
+UBE2T	Fanconi anemia complementation group T	high	AR		610538
+FH	hereditary leiomyomatosis and renal cell cancer / fumaric aciduria	high	AD		136850
+RPS7	Diamond-Blackfan anemia 8	high	AD		603658
+ALK	neuroblastoma, susceptibility to, 3	high	AD		613014
+SOS1	Noonan syndrome / Noonan syndrome 4	high	AD		182530
+EPCAM	Lynch syndrome 8 / congenital diarrhea 5 with tufting enteropathy / Lynch syndrome	high	AD		185535
+MSH2	Lynch syndrome 1 / Lynch syndrome / mismatch repair cancer syndrome 1	high	AD		609309
+MSH6	mismatch repair cancer syndrome 1 / Lynch syndrome / Lynch syndrome 5	high	AR		600678
+RPS27A	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	191343
+FANCL	Fanconi anemia complementation group L	high	AR		614083
+TMEM127	pheochromocytoma / hereditary pheochromocytoma-paraganglioma	high	AD		613403
+RPL31	Diamond-Blackfan anemia	moderate	AD		617415
+ERCC3	xeroderma pigmentosum group B / trichothiodystrophy 2, photosensitive	high	AR		133510
+BARD1	BARD1-related cancer predisposition / breast cancer	high	AD		601593
+DIS3L2	Perlman syndrome	high	AR		614184
+FANCD2	Fanconi anemia complementation group D2	high	AR		613984
+VHL	von Hippel-Lindau disease / pheochromocytoma	high	AD		608537
+RAF1	Noonan syndrome / Noonan syndrome 5	high	AD		164760
+XPC	xeroderma pigmentosum group C	high	AR		613208
+RPL15	Diamond-Blackfan anemia 12	high	AD		604174
+MLH1	mismatch repair cancer syndrome 1 / Lynch syndrome 2 / Lynch syndrome	high	AD		120436
+COL7A1	recessive dystrophic epidermolysis bullosa / dystrophic epidermolysis bullosa pruriginosa / epidermolysis bullosa with congenital localized absence of skin and deformity of nails	high	AR		120120
+BAP1	BAP1-related tumor predisposition syndrome	high	AD		603089
+MITF	Waardenburg syndrome type 2A / Waardenburg syndrome type 2 / Tietz syndrome	high	AD		156845
+GATA2	monocytopenia with susceptibility to infections / GATA2 deficiency with susceptibility to MDS/AML / deafness-lymphedema-leukemia syndrome	high	AD		137295
+MBD4	tumor predisposition syndrome 2	high	AR		603574
+ATR	Seckel syndrome 1	high	AR		601215
+MECOM	radioulnar synostosis with amegakaryocytic thrombocytopenia 2 / MECOM-associated syndrome	high	AD		165215
+TERC	dyskeratosis congenita, autosomal dominant 1	high	AD		602322
+PIK3CA	overgrowth syndrome and/or cerebral malformations due to abnormalities in MTOR pathway genes	high	AD		171834
+RPL35A	Diamond-Blackfan anemia 5	high	AD		180468
+PHOX2B	central hypoventilation syndrome, congenital, 1, with or without Hirschsprung disease / Haddad syndrome / neuroblastoma, susceptibility to, 2	high	AD		603851
+PDGFRA	gastrointestinal stromal tumor / polyps, multiple and recurrent inflammatory fibroid, gastrointestinal	high	AD		173490
+KIT	piebaldism / gastrointestinal stromal tumor	high	AD		164920
+SRP72	autosomal dominant aplasia and myelodysplasia	high	AD		604906
+REST	fibromatosis, gingival, 5 / Wilms tumor 6	high	AD		600571
+ABRAXAS1	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	606582
+NAF1	pulmonary fibrosis and/or bone marrow failure syndrome, telomere-related, 7	high	AD		617018
+PALLD	pancreatic cancer, susceptibility to, 1	low	AD		608092
+SDHA	hereditary pheochromocytoma-paraganglioma / pheochromocytoma/paraganglioma syndrome 5 / mitochondrial complex II deficiency, nuclear type 1	high	AD		600857
+TRIP13	oocyte maturation defect 9 / mosaic variegated aneuploidy syndrome 3	high	AR		604507
+TERT	dyskeratosis congenita, autosomal dominant 2 / pulmonary fibrosis and/or bone marrow failure, Telomere-related, 1	high	AD/AR		187270
+DNAJC21	bone marrow failure syndrome 3	high	AR		617242
+MSH3	familial adenomatous polyposis 4	high	AR		600887
+APC	familial adenomatous polyposis 1 / classic or attenuated familial adenomatous polyposis / gastric adenocarcinoma and proximal polyposis of the stomach	high	AD		175100
+RAD50	Nijmegen breakage syndrome-like disorder	high	AR		604040
+CTNNA1	CTNNA1-related diffuse gastric and lobular breast cancer syndrome / patterned macular dystrophy 2	high	AD		
+SPINK1	hereditary chronic pancreatitis	high	AD		167790
+PDGFRB	acroosteolysis-keloid-like lesions-premature aging syndrome / skeletal overgrowth-craniofacial dysmorphism-hyperelastic skin-white matter lesions syndrome / myofibromatosis, infantile, 1	high	AD		173410
+ITK	lymphoproliferative syndrome 1 / lymphoproliferative syndrome	high	AR		186973
+NPM1	dyskeratosis congenita	high	AD		164040
+NSD1	Sotos syndrome 1 / Sotos syndrome / Beckwith-Wiedemann syndrome due to NSD1 mutation	high	AD		606681
+DDX41	DDX41-related hematologic malignancy predisposition syndrome	high	AD		608416
+NHP2	dyskeratosis congenita, autosomal recessive 2	high	AR		606470
+SQSTM1	neurodegeneration with ataxia, dystonia, and gaze palsy, childhood-onset	high	AR		601530
+HLA-A	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	142800
+HLA-C	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	142840
+HLA-B	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	142830
+HLA-DRB1	systemic lupus erythematosus	low	Unknown		142857
+HLA-DQA1	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	146880
+HLA-DQB1	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	604305
+HLA-DPA1	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	142880
+RPS10	Diamond-Blackfan anemia	high	Unknown		603632
+FANCE	Fanconi anemia complementation group E	high	AR		600901
+POLH	xeroderma pigmentosum variant type	high	AR		603968
+TBXT	chordoma	high	AD		601397
+PMS2	mismatch repair cancer syndrome 1 / Lynch syndrome / Lynch syndrome 4	high	AR		600259
+PMS2CL	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	614337
+IKZF1	pancytopenia due to IKZF1 mutations	high	AD		603023
+GRB10	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	601523
+EGFR	lung cancer / non-small cell lung carcinoma	high	AD		131550
+SBDS	Shwachman-Diamond syndrome / Shwachman-Diamond syndrome 1	high	AR		607444
+SAMD9	MIRAGE syndrome / SAMD9-related spectrum and myeloid neoplasm risk	high	AD		610456
+SAMD9L	ataxia-pancytopenia syndrome / SAMD9L-related spectrum and myeloid neoplasm risk	high	AD		611170
+RINT1	infantile liver failure syndrome 3 / hereditary spastic paraplegia	high	AR		610089
+MET	hereditary papillary renal cell carcinoma / papillary renal cell carcinoma	high	AD		164860
+CFTR	cystic fibrosis / congenital bilateral aplasia of vas deferens from CFTR mutation	high	AR		602421
+POT1	tumor predisposition syndrome 3	high	AD		606478
+MEST	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	601996
+BRAF	cardiofaciocutaneous syndrome 1 / cardiofaciocutaneous syndrome / LEOPARD syndrome 3	high	AD		164757
+PRSS1	hereditary chronic pancreatitis	high	AD		276000
+XRCC2	Fanconi anemia complementation group U	moderate	AR		600375
+WRN	Werner syndrome	high	AR		604611
+RPS20	familial colorectal cancer / Diamond-Blackfan anemia	moderate	AD		603682
+NBN	Nijmegen breakage syndrome	high	AR		602667
+RAD21	Cornelia de Lange syndrome / Cornelia de Lange syndrome 4	high	AD		606462
+EXT1	exostoses, multiple, type 1	high	AD		608177
+NAPRT	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	611539
+RECQL4	Rothmund-Thomson syndrome / Baller-Gerold syndrome / Rothmund-Thomson syndrome type 2	high	AR		603780
+DOCK8	combined immunodeficiency due to DOCK8 deficiency	high	AR		611432
+MTAP	diaphyseal medullary stenosis-bone malignancy syndrome	high	AD		156540
+CDKN2A	melanoma-pancreatic cancer syndrome / melanoma, cutaneous malignant, susceptibility to, 2	high	AD		600160
+FANCG	Fanconi anemia complementation group G	high	AR		614082
+RMRP	cartilage-hair hypoplasia	high	AR		157660
+PAX5	leukemia, acute lymphoblastic, susceptibility to, 3	high	AD		167414
+FANCC	Fanconi anemia complementation group C	high	AR		613899
+PTCH1	nevoid basal cell carcinoma syndrome / holoprosencephaly 7 / basal cell nevus syndrome 1	high	AD		601309
+ERCC6L2	pancytopenia-developmental delay syndrome	high	AR		615667
+XPA	xeroderma pigmentosum group A	high	AR		611153
+GALNT12	colorectal cancer, susceptibility to, 1	low	AD		610290
+ELP1	primary dysautonomia / Riley-Day syndrome / medulloblastoma	high	AR		603722
+TSC1	tuberous sclerosis 1	high	AD		605284
+ANKRD26	thrombocytopenia 2	high	AD		
+RET	multiple endocrine neoplasia type 2B / multiple endocrine neoplasia type 2A / pheochromocytoma	high	AD		164761
+ARID5B	isolated cleft palate		Unknown		608036
+PRF1	familial hemophagocytic lymphohistiocytosis 2	high	AR		170280
+RPS24	Diamond-Blackfan anemia / Diamond-Blackfan anemia 3	high	Unknown		602412
+BMPR1A	generalized juvenile polyposis/juvenile polyposis coli / juvenile polyposis syndrome	high	AD		601299
+KLLN	Cowden disease	low	AD		612105
+PTEN	Cowden syndrome 1 / PTEN hamartoma tumor syndrome / Lhermitte-Duclos disease	high	AD		601728
+FAS	autoimmune lymphoproliferative syndrome type 1 / autoimmune lymphoproliferative syndrome / FAS-related autoimmune lymphoproliferative immune disorder	high	AD		134637
+SUFU	medulloblastoma / nevoid basal cell carcinoma syndrome	high	AD		607035
+STN1	cerebroretinal microangiopathy with calcifications and cysts 2	high	AR		613128
+SHOC2	Noonan syndrome-like disorder with loose anagen hair / Noonan syndrome-like disorder with loose anagen hair 1	high	AD		602775
+HRAS	Costello syndrome	high	AD		
+H19	Beckwith-Wiedemann syndrome	high	AD		103280
+IGF2	Silver-Russell syndrome 3 / Beckwith-Wiedemann syndrome due to imprinting defect of 11p15	high	AD		147470
+KCNQ1	long QT syndrome / Jervell and Lange-Nielsen syndrome / Jervell and Lange-Nielsen syndrome 1	high	AR		607542
+KCNQ1OT1	Beckwith-Wiedemann syndrome	low	Unknown		604115
+CDKN1C	Beckwith-Wiedemann syndrome / IMAGe syndrome	high	AD		600856
+CTR9	CTR9-related neurodevelopmental disorder / childhood kidney Wilms tumor	moderate	AD		609414
+FANCF	Fanconi anemia complementation group F	high	AR		613897
+ISCA-37401_WAGR_region	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	194072
+PAX6	PAX6-related ocular dysgenesis / Peters anomaly / aniridia 1	high	AD		607108
+WT1	Denys-Drash syndrome / Wilms tumor 1	high	AD		194071
+EXT2	exostoses, multiple, type 2	high	AD		608210
+DDB2	xeroderma pigmentosum group E	high	AR		600811
+SDHAF2	hereditary pheochromocytoma-paraganglioma / pheochromocytoma/paraganglioma syndrome 2	high	AD		613019
+MEN1	multiple endocrine neoplasia type 1	high	AD		131100
+AIP	growth hormone secreting pituitary adenoma 1	high	AD		605555
+MRE11	ataxia-telangiectasia-like disorder 1	high	AR		600814
+ATM	ataxia telangiectasia / hereditary breast carcinoma / ATM-related cancer predisposition	high	AR		607585
+SDHD	pheochromocytoma/paraganglioma syndrome 1 / hereditary pheochromocytoma-paraganglioma / pheochromocytoma	high	AD		602690
+HMBS	acute intermittent porphyria	high	AD/AR		609806
+CBL	CBL-related disorder	high	AD		165360
+ETV6	thrombocytopenia 5	high	AD		600618
+CDKN1B	multiple endocrine neoplasia type 4	high	AD		600778
+KRAS	Noonan syndrome 3 / Noonan syndrome / cardiofaciocutaneous syndrome 2	high	AD		190070
+RPS26	Diamond-Blackfan anemia 10	high	AD		603701
+CDK4	melanoma, cutaneous malignant, susceptibility to, 3	high	AD		123829
+SH2B3	SH2B3-related immune system disorder	high	AD/AR		605093
+PTPN11	Noonan syndrome 1 / Noonan syndrome with multiple lentigines / Noonan syndrome	high	AD		176876
+ZCCHC8	pulmonary fibrosis and/or bone marrow failure, telomere-related	high	AD		613389
+POLE	POLE-related polyposis and colorectal cancer syndrome	high	AD		174762
+BRCA2	breast-ovarian cancer, familial, susceptibility to, 2 / Fanconi anemia complementation group D1 / BRCA2-related cancer predisposition	high	AR		600185
+RB1	hereditary retinoblastoma / retinoblastoma	high	AD		614041
+ERCC5	xeroderma pigmentosum group G	high	AR		133530
+LIG4	DNA ligase IV deficiency	high	AR		601837
+TINF2	dyskeratosis congenita, autosomal dominant 3 / Revesz syndrome	high	AD		604319
+FANCM	FANCM Fanconi-like genomic instability disorder	high	AR		609644
+RPS29	Diamond-Blackfan anemia 13	high	AD		603633
+MAX	pheochromocytoma / hereditary pheochromocytoma-paraganglioma	high	AD		154950
+RAD51B	primary ovarian failure	low	AR		602948
+MLH3	colorectal cancer, hereditary nonpolyposis, type 7	moderate	AD		604395
+DICER1	DICER1-related tumor predisposition	high	AD		606241
+ATG2B	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	616228
+GSKIP	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	616278
+AKT1	Proteus syndrome	high	AD		
+FAN1	karyomegalic interstitial nephritis	high	AR		613534
+GREM1	hereditary mixed polyposis syndrome	high	AD		603054
+NOP10	dyskeratosis congenita, autosomal recessive 1	high	AR		606471
+SPRED1	Legius syndrome	high	AD		609291
+BUB1B	mosaic variegated aneuploidy syndrome 1	high	AR		602860
+RAD51	Fanconi anemia complementation group R / mirror movements 2	high	AD		179617
+MAP2K1	cardiofaciocutaneous syndrome / cardiofaciocutaneous syndrome 3	high	AD		176872
+EFL1	Shwachman-Diamond syndrome 2	high	AR		617538
+RPS17	Diamond-Blackfan anemia 4	high	AD		180472
+FANCI	Fanconi anemia complementation group I	high	AR		611360
+BLM	Bloom syndrome	high	AR		604610
+NTHL1	familial adenomatous polyposis 3 / NTHL1-deficiency tumor predisposition syndrome	high	AR		602656
+TSC2	tuberous sclerosis 2	high	AD		191092
+SLX4	Fanconi anemia complementation group P	high	AR		
+ERCC4	xeroderma pigmentosum group F	high	AR		133520
+PARN	pulmonary fibrosis and/or bone marrow failure, Telomere-related, 4 / dyskeratosis congenita, autosomal recessive 6	high	AD/AR		604212
+PALB2	hereditary breast carcinoma / Fanconi anemia complementation group N / PALB2-related cancer predisposition	high	AD		610355
+CYLD	Brooke-Spiegler syndrome / familial cylindromatosis	high	AD		605018
+ACD	ACD-related short telomere syndrome	high	AD/AR		
+CDH1	hereditary diffuse gastric adenocarcinoma / hereditary breast carcinoma / CDH1-related diffuse gastric and lobular breast cancer syndrome	high	AD		192090
+RFWD3	Fanconi anemia, complementation group W	moderate	AR		614595
+TERF2IP	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	605061
+FANCA	Fanconi anemia complementation group A	high	AR		607139
+MC1R	oculocutaneous albinism type 2	moderate	AR		155555
+RPA1	pulmonary fibrosis and/or bone marrow failure, telomere-related, 6	high	AD		179835
+TP53	breast cancer / Li-Fraumeni syndrome 1 / Li-Fraumeni syndrome	high	AD		191170
+WRAP53	dyskeratosis congenita, autosomal recessive 3	high	AR		612661
+CTC1	cerebroretinal microangiopathy with calcifications and cysts 1 / dyskeratosis congenita	high	AR		
+RPL26	Diamond-Blackfan anemia 11	high	AD		603704
+DNAH9	ciliary dyskinesia, primary, 40	high	AR		603330
+FLCN	Birt-Hogg-Dube syndrome 1 / Birt-Hogg-Dube syndrome	high	AD		607273
+NF1	neurofibromatosis type 1	high	AD		162200
+RAD51D	RAD51D-related cancer predisposition	high	AD		602954
+RPL23	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	604044
+CDK12	Tourette syndrome		Unknown		601435
+SMARCE1	familial meningioma / Coffin-Siris syndrome	high	AD		603111
+STAT3	STAT3-related early-onset multisystem autoimmune disease / hyper-IgE recurrent infection syndrome 1, autosomal dominant	high	AD		102582
+BRCA1	breast-ovarian cancer, familial, susceptibility to, 1 / Fanconi anemia, complementation group S / BRCA1-related cancer predisposition	high	AD		113705
+RPL27	Diamond-Blackfan anemia 16	moderate	AD		607526
+G6PC3	autosomal recessive severe congenital neutropenia due to G6PC3 deficiency	high	AR		611045
+HOXB13	prostate cancer	high	AD		604607
+RNF43	sessile serrated polyposis cancer syndrome	high	AD		612482
+RAD51C	RAD51C-related cancer predisposition	high	AD		602774
+TRIM37	mulibrey nanism	high	AR		605073
+PPM1D	syndromic intellectual disability / intellectual developmental disorder with gastrointestinal difficulties and high pain threshold	high	AD		605100
+BRIP1	familial ovarian cancer / Fanconi anemia complementation group J / Fanconi anemia	high	AR		605882
+AXIN2	oligodontia-cancer predisposition syndrome	high	AD		604025
+PRKAR1A	Carney complex, type 1 / acrodysostosis with multiple hormone resistance / Acrodysostosis 1 with or without hormone resistance	high	AD		188830
+RHBDF2	palmoplantar keratoderma-esophageal carcinoma syndrome	high	AD		614403
+FAAP100	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	609154
+SETBP1	Schinzel-Giedion syndrome / complex neurodevelopmental disorder / intellectual disability, autosomal dominant 29	high	AD		611060
+SMAD4	juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome / Myhre syndrome	high	AD		600993
+ELANE	neutropenia	high	AD		130130
+STK11	Peutz-Jeghers syndrome / familial pancreatic carcinoma	high	AD		602216
+MAP2K2	cardiofaciocutaneous syndrome / cardiofaciocutaneous syndrome 4	high	AD		601263
+RPL36	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	605289
+RPS28	Diamond-Blackfan anemia 15 with mandibulofacial dysostosis	moderate	AD		603685
+SMARCA4	Coffin-Siris syndrome / rhabdoid tumor predisposition syndrome 2 / intellectual disability, autosomal dominant 16	high	AD		603254
+CEBPA	acute myeloid leukemia	high	AD		116897
+RPS19	Diamond-Blackfan anemia 1 / Diamond-Blackfan anemia	high	AD		603474
+ERCC2	xeroderma pigmentosum group D / trichothiodystrophy 1, photosensitive / cerebrooculofacioskeletal syndrome 2	high	AR		126340
+ERCC1	cerebrooculofacioskeletal syndrome 4	high	AR		126360
+POLD1	POLD1-related polyposis and colorectal cancer syndrome / mandibular hypoplasia-deafness-progeroid syndrome	high	AD		174761
+NLRP7	hydatidiform mole, recurrent, 1	high	AR		609661
+NLRP2	oocyte/zygote/embryo maturation arrest 18	high	AR		609364
+NLRP5	oocyte/zygote/embryo maturation arrest 19 / Beckwith-Wiedemann syndrome	high	AR		609658
+TRIM28	childhood kidney Wilms tumor	high	AD		601742
+L3MBTL1	No GenCC gene-disease assertion	Not GenCC-curated	-	not curated	607808
+RTEL1	dyskeratosis congenita, autosomal recessive 5 / pulmonary fibrosis and/or bone marrow failure, Telomere-related, 3 / dyskeratosis congenita and related telomere biology disorder	high	AD/AR		
+RUNX1	hereditary thrombocytopenia and hematological cancer predisposition syndrome associated with RUNX1 / hereditary thrombocytopenia and hematologic cancer predisposition syndrome	high	AD		151385
+LZTR1	Noonan syndrome 10 / LZTR1-related schwannomatosis / Noonan syndrome	high	AD		600574
+SMARCB1	rhabdoid tumor predisposition syndrome 1 / Coffin-Siris syndrome / intellectual disability, autosomal dominant 15	high	AD		601607
+CHEK2	CHEK2-related cancer predisposition / Li-Fraumeni syndrome 2	high	AD		604373
+NF2	NF2-related schwannomatosis	high	AD		607379
+FANCB	Fanconi anemia complementation group B	high	XL		300514
+WAS	Wiskott-Aldrich syndrome / X-linked severe congenital neutropenia	high	XL		301000
+GATA1	GATA1-Related X-Linked Cytopenia	high	XL		305371
+TSR2	Diamond-Blackfan anemia	low	AD		300945
+SH2D1A	X-linked lymphoproliferative disease due to SH2D1A deficiency	high	XL		300490
+GPC3	Simpson-Golabi-Behmel syndrome type 1 / Simpson-Golabi-Behmel syndrome	high	XL		
+DKC1	dyskeratosis congenita, X-linked / DKC1-related disorder	high	XL		300126
+SRY	46,XX sex reversal 1 / 46,XY sex reversal 1	high	XL		480000

@@ -1,0 +1,128 @@
+# =============================================================================
+# SignalScope — configuration TEMPLATE
+#
+# Copy this file, fill in the values marked [SET THIS], and run:
+#   snakemake --configfile config/my_panel.yaml \
+#             --config sample=SAMPLE start_from=bam existing_bam=/path/to.bam \
+#             --directory . --cores 16
+#
+# See config.ckd.yaml and config.cancer.yaml for complete worked examples.
+# =============================================================================
+
+# --- Entry point (also settable on the command line) ------------------------
+start_from:     "bam"        # pod5 | fastq | bam
+existing_bam:   ""           # [SET if start_from=bam] aligned BAM (with secondary alignments)
+existing_fastq: ""           # [SET if start_from=fastq]
+
+# --- Run directory layout (relative to where you run snakemake) -------------
+pod5_base:    "pod5_pass"
+samples_root: "samples"
+
+# --- Run metadata -----------------------------------------------------------
+sequencing_summary_file: ""  # optional; if absent, metrics derived from BAM
+run_id:                  ""  # shown in report header
+
+# --- Report header ----------------------------------------------------------
+report_date: ""              # empty = today
+report:
+  version:     "1.0"
+  platform:    "ONT PromethION"
+  library:     "SQK-NBD114.24"
+  targeting:   "Adaptive sampling"
+  basecalling: "Dorado SUP"          # [SET] SUP or HAC, to match your data
+  alignment:   "minimap2 (GRCh38)"
+  variants:    "Clair3, DeepVariant, Sniffles2, CuteSV"
+  logo_filename: "SignalScope_logo.png"
+  minknow_version: ""
+
+# --- Reference genome (EXTERNAL — you provide) ------------------------------
+ref_fasta: ""                # [SET THIS] GRCh38 .fa (with .fai alongside)
+ref_mmi:   ""                # optional minimap2 index; built if empty
+
+# --- Panel + gene annotation (shipped in resources/, or your own) -----------
+panel_bed:          ""       # [SET THIS] your panel BED
+report_bed:         ""       # [SET THIS] usually same as panel_bed
+deepvariant_bed:    ""       # [SET THIS] 3-column BED for DeepVariant
+gene_context_ref:   ""       # [SET THIS] per-gene context TSV (see build_gene_context_gencc.py)
+gene_intervals_ref: ""       # [SET THIS]
+gene_features_ref:  ""       # [SET THIS]
+exon_boundaries_ref: ""      # [SET THIS] (used for SV shortlisting)
+
+# Pseudogene competitive-realignment reference (only if your panel needs recovery)
+masked_ref: ""               # [SET if using pseudogene recovery]
+
+# --- Tools (from the SignalScope conda env — bare names) --------------------
+tools:
+  minimap2: "minimap2"
+  samtools: "samtools"
+  bcftools: "bcftools"
+  sniffles: "sniffles"
+  cutesv:   "cuteSV"
+  mosdepth: "mosdepth"
+  nanoplot: "NanoPlot"
+  igv:      "igv"
+  # External (not in conda env) — needed only for start_from=pod5 (basecalling):
+  dorado:   ""               # [SET THIS if start_from=pod5] ONT Dorado binary
+
+# --- Variant-caller containers (pull the pinned Apptainer/Singularity images) ---
+# SNV/indel callers run from GPU containers (see README "External resources").
+deepvariant_sif: ""          # [SET THIS] deepvariant_1.10.0-gpu.sif (apptainer pull docker://google/deepvariant:1.10.0-gpu)
+
+# --- Dorado basecalling model (must match your chemistry) -------------------
+dorado:
+  model:       ""            # [SET THIS] e.g. dna_r10.4.1_e8.2_400bps_sup@v4.2.0
+  extra_flags: "--emit-fastq"
+
+# --- Clair3 (model MUST match the basecaller) -------------------------------
+#   SUP basecalling -> r1041_e82_400bps_sup_v420
+#   HAC basecalling -> r1041_e82_400bps_hac_v430
+clair3:
+  sif:       ""              # [SET THIS] clair3_v2.0.1_gpu.sif (apptainer pull docker://hkubal/clair3:v2.0.1_gpu)
+  model_dir: "models"        # shipped PyTorch models live here (relative to repo root)
+  model:     ""              # [SET THIS] PyTorch model matching your basecaller:
+                             #   Dorado sup@v4.2.0 -> clair3_pytorch_sup_v420
+                             #   Dorado hac@v4.3.0 -> clair3_pytorch_hac_v430
+
+# --- Structural variants ----------------------------------------------------
+sniffles:
+  minsvlen:   50
+  minsupport: "auto"
+
+# --- VEP annotation ---------------------------------------------------------
+vep:
+  sif:      ""               # [SET THIS] ensembl-vep_release_116.0.sif (apptainer pull docker://ensemblorg/ensembl-vep:release_116.0)
+  cache:    ""               # [SET THIS] VEP 116 GRCh38 cache dir (~26 GB; extract FULLY - see README)
+  plugins:  ""               # [SET THIS] VEP Plugins dir (for REVEL/SpliceAI, optional)
+  assembly: "GRCh38"
+  extra_flags: "--everything --offline --format vcf --tab"
+  # To add REVEL / SpliceAI, append to extra_flags:
+  #   --plugin REVEL,file=/path/to/revel.tsv.gz
+  #   --plugin SpliceAI,snv=/path/to/spliceai.vcf.gz,indel=/path/to/spliceai.vcf.gz
+
+# --- Variant prioritisation -------------------------------------------------
+clinical_filtering:
+  high_priority_impacts:      ["HIGH", "MODERATE"]
+  high_priority_consequences:
+    - "frameshift_variant"
+    - "stop_gained"
+    - "splice_acceptor_variant"
+    - "splice_donor_variant"
+    - "missense_variant"
+    - "start_lost"
+    - "stop_lost"
+  max_population_af:  0.01
+  min_caller_support: 1
+  pathogenic_clinsig: ["Pathogenic", "Likely_pathogenic", "Pathogenic/Likely_pathogenic"]
+
+# --- Pseudogene recovery (auto-detects target genes from panel_bed) ---------
+pseudogene_recovery:
+  enabled: true
+  genes: []                  # empty = auto-detect from panel_bed
+
+# --- Compute ----------------------------------------------------------------
+threads: 16
+
+# --- Test mode (small region, debugging only) -------------------------------
+test_mode:   false
+test_region: ""
+test_bed:    ""

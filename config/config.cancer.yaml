@@ -1,0 +1,99 @@
+start_from:   "bam"
+existing_bam: "/bioinformatics/rafaella/hcp_barcode01_bams/barcode01.primary.bam"
+existing_fastq: ""
+
+pod5_base:    "pod5_pass"
+samples_root: "samples"
+
+sequencing_summary_file: "/bioinformatics/rafaella/genome_in_a_bottle_test_pipe/cancer_pipeline_test/run_metadata/sequencing_summary_hcp_barcode01.txt"
+run_id: "PBC83386_FC01_barcode01"
+
+report_date: ""
+
+report:
+  version:    "1.0"
+  platform:   "ONT PromethION"
+  library:    "SQK-NBD114.24"
+  targeting:  "Adaptive sampling"
+  basecalling: "Dorado HAC v4.3.0"
+  alignment:  "minimap2 (GRCh38)"
+  variants:   "Clair3, DeepVariant, Sniffles2, CuteSV"
+  logo_filename: "SignalScope_logo.png"
+  minknow_version: "6.4"
+
+ref_fasta: "/bioinformatics/rafaella/DNA_reference/GRCh38_full_analysis_set_plus_decoy_hla.fa"
+ref_mmi:   ""
+
+panel_bed:  "resources/panels/hcp_real_panel.bed"
+report_bed: "resources/panels/hcp_real_panel.bed"
+
+gene_intervals_ref: "resources/reporting/hcp_gene_intervals.tsv"
+gene_context_ref:   "resources/gene_context/cancer_gene_context.tsv"
+gene_features_ref:  "resources/reporting/hcp_gene_features.tsv"
+
+tools:
+  minimap2: "minimap2"
+  samtools: "samtools"
+  bcftools: "bcftools"
+  sniffles: "sniffles"
+  cutesv:   "cuteSV"
+  mosdepth: "mosdepth"
+  nanoplot: "NanoPlot"
+  igv:      "tools/IGV_Linux_2.17.4/igv.sh"
+  dorado:   "/bioinformatics/rafaella/tools_pipeline/dorado-0.9.1/bin/dorado"
+  vep:      "/bioinformatics/rafaella/tools_pipeline/ensembl-vep/vep"
+
+deepvariant_sif: "/data2/rafaella/apptainer_tmp/deepvariant_1.10.0-gpu.sif"
+deepvariant_bed: "resources/panels/hcp_real_panel.3col.bed"
+
+dorado:
+  model:       "dna_r10.4.1_e8.2_hac@v4.3.0"
+  extra_flags: "--emit-fastq"
+
+clair3:
+  sif:       "/data2/rafaella/apptainer_tmp/clair3_v2.0.1_gpu.sif"
+  model_dir: "models"
+  model:     "clair3_pytorch_hac_v430"
+
+
+sniffles:
+  minsvlen:   10
+  minsupport: "auto"
+
+vep:
+  sif:         "/data2/rafaella/apptainer_tmp/ensembl-vep_release_116.0.sif"
+  cache:       "/bioinformatics/rafaella/tools_pipeline/vep_cache_116"
+  plugins:     "/bioinformatics/rafaella/tools_pipeline/ensembl-vep/Plugins"
+  assembly:    "GRCh38"
+  extra_flags: "--everything --offline --format vcf --tab --plugin REVEL,file=/bioinformatics/rafaella/tools_pipeline/vep_plugins_data/revel/new_tabbed_revel_grch38.tsv.gz --plugin SpliceAI,snv=/bioinformatics/rafaella/tools_pipeline/vep_plugins_data/spliceai/spliceai_scores.masked.snv.hg38.vcf.gz,indel=/bioinformatics/rafaella/tools_pipeline/vep_plugins_data/spliceai/spliceai_scores.masked.snv.hg38.vcf.gz"
+
+clinical_filtering:
+  high_priority_impacts:
+    - "HIGH"
+    - "MODERATE"
+  high_priority_consequences:
+    - "frameshift_variant"
+    - "stop_gained"
+    - "splice_acceptor_variant"
+    - "splice_donor_variant"
+    - "missense_variant"
+    - "start_lost"
+    - "stop_lost"
+  max_population_af:  0.01
+  min_caller_support: 1
+  pathogenic_clinsig:
+    - "Pathogenic"
+    - "Likely_pathogenic"
+    - "Pathogenic/Likely_pathogenic"
+
+threads: 16
+test_mode:   false
+test_region: ""
+test_bed:    ""
+# Pseudogene recovery (v3): enabled; genes auto-detected from panel_bed.
+# For the cancer panel this auto-detects PMS2 (PMS2CL pseudogene, chr7).
+pseudogene_recovery:
+  enabled: true
+  genes: []          # empty = auto-detect from panel_bed
+masked_ref:    ""
+exon_boundaries_ref: "resources/reporting/hcp_exon_boundaries.tsv"

@@ -1,0 +1,101 @@
+start_from:   "bam"
+existing_bam: ""
+existing_fastq: ""
+
+pod5_base:    "pod5_pass"
+samples_root: "samples"
+
+sequencing_summary_file: "/bioinformatics/rafaella/Feb_run_total/run_metadata/sequencing_summary_PBI88810_dd993839_aedf540f.txt"
+run_id: "PBI88810_dd993839_aedf540f"
+
+report_date: ""
+
+report:
+  version:    "1.0"
+  platform:   "ONT PromethION"
+  library:    "SQK-NBD114.24"
+  targeting:  "Adaptive sampling"
+  basecalling: "Dorado SUP v4.2.0"
+  alignment:  "minimap2 (GRCh38)"
+  variants:   "Clair3, DeepVariant, Sniffles2, CuteSV"
+  logo_filename: "SignalScope_logo.png"
+  minknow_version: "6.4"
+
+ref_fasta: "/bioinformatics/rafaella/BED_and_REFERENCE_UPDATED_for_Optimised_AS/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+ref_mmi:   ""
+
+panel_bed:  "resources/panels/RefSeq_kidgen_33_hg38_REPORT_NO_chr.bed"
+report_bed: "resources/panels/RefSeq_kidgen_33_hg38_REPORT_NO_chr.bed"
+
+gene_intervals_ref: "resources/reporting/kidgen33.gene_intervals.tsv"
+gene_context_ref:   "resources/gene_context/ckd_gene_context.tsv"
+gene_features_ref:  "resources/reporting/kidgen33.gene_features.tsv"
+
+tools:
+  # Provided by the SignalScope conda env (run inside it). See environment.yml.
+  minimap2: "minimap2"
+  samtools: "samtools"
+  bcftools: "bcftools"
+  sniffles: "sniffles"
+  cutesv:   "cuteSV"
+  mosdepth: "mosdepth"
+  nanoplot: "NanoPlot"
+  igv:      "tools/IGV_Linux_2.17.4/igv.sh"
+  # External (not in conda env) - set to your paths:
+  dorado:   "/bioinformatics/rafaella/tools_pipeline/dorado-0.9.1/bin/dorado"
+  vep:      "/bioinformatics/rafaella/tools_pipeline/ensembl-vep/vep"
+
+deepvariant_sif: "/data2/rafaella/apptainer_tmp/deepvariant_1.10.0-gpu.sif"
+deepvariant_bed: "resources/panels/RefSeq_kidgen_33_hg38_REPORT_NO_chr.3col.bed"
+
+dorado:
+  model:       "models/dorado/dna_r10.4.1_e8.2_400bps_sup@v5.0.0"
+  extra_flags: "--emit-fastq"
+
+clair3:
+  sif:       "/data2/rafaella/apptainer_tmp/clair3_v2.0.1_gpu.sif"
+  model_dir: "models"
+  model:     "clair3_pytorch_sup_v500"
+
+
+sniffles:
+  minsvlen:   10
+  minsupport: "auto"
+
+vep:
+  sif:         "/data2/rafaella/apptainer_tmp/ensembl-vep_release_116.0.sif"
+  cache:       "/bioinformatics/rafaella/tools_pipeline/vep_cache_116"
+  plugins:     "/bioinformatics/rafaella/tools_pipeline/ensembl-vep/Plugins"
+  assembly:    "GRCh38"
+  extra_flags: "--everything --offline --format vcf --tab --plugin REVEL,file=/bioinformatics/rafaella/tools_pipeline/vep_plugins_data/revel/new_tabbed_revel_grch38.tsv.gz --plugin SpliceAI,snv=/bioinformatics/rafaella/tools_pipeline/vep_plugins_data/spliceai/spliceai_scores.masked.snv.hg38.vcf.gz,indel=/bioinformatics/rafaella/tools_pipeline/vep_plugins_data/spliceai/spliceai_scores.masked.snv.hg38.vcf.gz"
+
+clinical_filtering:
+  high_priority_impacts:
+    - "HIGH"
+    - "MODERATE"
+  high_priority_consequences:
+    - "frameshift_variant"
+    - "stop_gained"
+    - "splice_acceptor_variant"
+    - "splice_donor_variant"
+    - "missense_variant"
+    - "start_lost"
+    - "stop_lost"
+  max_population_af:  0.01
+  min_caller_support: 1
+  pathogenic_clinsig:
+    - "Pathogenic"
+    - "Likely_pathogenic"
+    - "Pathogenic/Likely_pathogenic"
+
+threads: 16
+test_mode:   false
+test_region: ""
+test_bed:    ""
+# Pseudogene recovery (v3): enabled; genes auto-detected from panel_bed.
+# For the cancer panel this auto-detects PMS2 (PMS2CL pseudogene, chr7).
+pseudogene_recovery:
+  enabled: true
+  genes: []          # empty = auto-detect from panel_bed
+masked_ref: "/bioinformatics/rafaella/BED_and_REFERENCE_UPDATED_for_Optimised_AS/GRCh38.muc1_pkd1_only.fa"
+exon_boundaries_ref: "resources/reporting/kidgen33.exon_boundaries.tsv"

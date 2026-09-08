@@ -1,0 +1,2966 @@
+# =============================================================================
+# SignalScope — Panel-Agnostic Long-Read Sequencing Pipeline — Snakefile
+#
+# Oxford Nanopore R10.4.1 / GRCh38 or T2T-CHM13 / Any gene panel
+#
+# PIPELINE STRUCTURE
+# ------------------
+# All outputs are written under:
+#   {samples_root}/{sample}/
+#
+# Input POD5 is read from (never written to):
+#   {pod5_base}/{sample}/
+#
+# OUTPUT DIRECTORY LAYOUT PER SAMPLE
+# ------------------------------------
+#   raw/fastq/          — basecalled FASTQ (gzipped)
+#   alignments/         — sorted BAMs and indexes
+#   qc/                 — NanoPlot, flagstat, panel depth
+#   coverage/           — mosdepth outputs
+#   variants/
+#     small_variants/
+#       clair3/         — raw Clair3 output
+#       deepvariant/    — DeepVariant VCF
+#     structural_variants/
+#       sniffles/       — Sniffles VCF.gz
+#   annotation/
+#     vcf_inputs/       — panel-filtered VCF ready for VEP
+#     vep/              — VEP TSV + stats
+#     tables/           — concordance tables
+#   logs/               — per-rule stdout and stderr logs
+#   tmp/                — intermediate files safe to leave
+#   run_metadata/       — software versions
+#
+# START MODES
+# -----------
+# The pipeline supports three entry points via config start_from:
+#   pod5  — runs Dorado then continues
+#   fastq — skips Dorado; reads from config["existing_fastq"]
+#   bam   — skips Dorado and alignment; reads from config["existing_bam"]
+#
+# LAYER STATUS
+# ------------
+# Layer 1 (core):     ACTIVE — basecall/align/QC/Clair3
+# Layer 2 (variant analysis): SNV/indel via Clair3 + DeepVariant; SV via Sniffles2 + CuteSV; per-class concordance
+# Layer 3 (clinical interpretation & reporting): VEP annotation, ACMG/AMP classification, shortlisting, and HTML report
+#
+# USAGE
+# -----
+#   # Dry run first — always:
+#   snakemake -n --reason --config sample=barcodeXX start_from=bam existing_bam=/abs/path/to.bam
+#
+#   # From existing BAM (most common — skip Dorado + alignment):
+#   snakemake --config sample=barcode06 start_from=bam \
+#       existing_bam=/abs/path/to/barcode06.primary.bam --cores 16
+#
+#   # From existing FASTQ (skip Dorado only):
+#   snakemake --config sample=barcode06 start_from=fastq \
+#       existing_fastq=/abs/path/to/barcode06.fastq.gz --cores 16
+#
+#   # From POD5 (full run including Dorado basecalling):
+#   snakemake --config sample=barcode06 start_from=pod5 --cores 16
+#
+#   # Stop before variant calling (QC + coverage only):
+#   snakemake --config sample=barcode06 start_from=bam \
+#       existing_bam=/abs/path/to/barcode06.primary.bam --cores 16 --until mosdepth_coverage
+#
+#   # Report/preview only (assumes all outputs already exist):
+#   snakemake --config sample=barcode06 start_from=bam \
+#       existing_bam=/abs/path/to/barcode06.primary.bam --cores 1 \
+#       --forcerun generate_report_html
+#
+#   # DAG visualisation:
+#   snakemake --config sample=barcode06 start_from=bam \
+#       existing_bam=/abs/path/to/barcode06.primary.bam --rulegraph | dot -Tpng > dag.png
+# =============================================================================
+
+configfile: "config.yaml"
+
+import os
+
+# ── Auto-detect input format (SignalScope v3) ────────────────────────────
+# If start_from is not explicitly set, detect from input file extension.
+import os as _os
+def _auto_detect_start(cfg):
+    explicit = cfg.get("start_from", "")
+    if explicit:
+        return explicit
+    ip = cfg.get("input_path", "")
+    if not ip:
+        if cfg.get("existing_bam", ""):
+            return "bam"
+        elif cfg.get("existing_fastq", ""):
+            return "fastq"
+        return "pod5"
+    if _os.path.isdir(ip):
+        return "pod5"
+    ext = ip.lower()
+    if ext.endswith(".pod5"):
+        return "pod5"
+    elif ext.endswith((".fastq", ".fastq.gz", ".fq", ".fq.gz")):
+        return "fastq"
+    elif ext.endswith(".bam"):
+        return "bam"
+    return "pod5"
+
+
+
+# =============================================================================
+# CONFIGURATION RESOLUTION
+#
+# All path variables are derived here. Rules reference these names only.
+# Nothing is hardcoded inside rule bodies.
+# =============================================================================
+
+# SAMPLE must be provided on the command line: --config sample=barcodeXX
+# The config.yaml deliberately leaves this unset to prevent accidental runs.
+SAMPLE = config.get("sample", "")
+if not SAMPLE:
+    raise ValueError(
+        "[ERROR] No sample specified.\n"
+        "  Run with: snakemake --config sample=barcodeXX start_from=bam existing_bam=... --cores N"
+    )
+
+# --- Per-sample root directory -----------------------------------------------
+# Every output file is under SAMPLE_ROOT. This is the only directory the
+# pipeline writes to — pod5_pass/ is never touched.
+SAMPLE_ROOT = os.path.join(config["samples_root"], SAMPLE)
+
+# Sub-directories under SAMPLE_ROOT (using string constants for clarity)
+RAW_DIR    = os.path.join(SAMPLE_ROOT, "raw")
+ALIGN_DIR  = os.path.join(SAMPLE_ROOT, "alignments")
+QC_DIR     = os.path.join(SAMPLE_ROOT, "qc")
+COV_DIR    = os.path.join(SAMPLE_ROOT, "coverage")
+VAR_DIR    = os.path.join(SAMPLE_ROOT, "variants")
+ANNOT_DIR  = os.path.join(SAMPLE_ROOT, "annotation")
+LOG_DIR    = os.path.join(SAMPLE_ROOT, "logs")
+TMP_DIR    = os.path.join(SAMPLE_ROOT, "tmp")
+META_DIR   = os.path.join(SAMPLE_ROOT, "run_metadata")
+
+# Variant sub-directories
+CLAIR3_DIR   = os.path.join(VAR_DIR, "small_variants", "clair3")
+SNIFFLES_DIR = os.path.join(VAR_DIR, "structural_variants", "sniffles")
+CUTESV_DIR   = os.path.join(VAR_DIR, "structural_variants", "cutesv")
+
+# Annotation sub-directories
+VCF_IN_DIR   = os.path.join(ANNOT_DIR, "vcf_inputs")
+VEP_DIR      = os.path.join(ANNOT_DIR, "vep")
+TABLES_DIR   = os.path.join(ANNOT_DIR, "tables")
+
+# --- Tool binaries ------------------------------------------------------------
+DORADO   = config["tools"]["dorado"]
+MINIMAP2 = config["tools"]["minimap2"]
+SAMTOOLS = config["tools"]["samtools"]
+SCRIPTS = os.path.join(workflow.basedir, "scripts")   # anchored to Snakefile location
+BCFTOOLS = config["tools"]["bcftools"]
+SNIFFLES = config["tools"]["sniffles"]
+MOSDEPTH = config["tools"]["mosdepth"]
+NANOPLOT = config["tools"]["nanoplot"]
+VEP_SIF = config["vep"]["sif"]
+# Bind the directories that hold the data VEP needs, derived from the config
+# paths (reference, cache, plugins, SIF) so the container works on any host
+# without hardcoded mount points. Duplicate/empty entries are de-duplicated.
+def _vep_binds():
+    import os as _os
+    paths = [
+        _os.path.dirname(_os.path.abspath(config["ref_fasta"])),
+        _os.path.abspath(config["vep"]["cache"]),
+        _os.path.abspath(config["vep"].get("plugins", "") or config["vep"]["cache"]),
+        _os.path.dirname(_os.path.abspath(VEP_SIF)),
+        _os.path.abspath(config["samples_root"]),
+    ]
+    seen, binds = set(), []
+    for d in paths:
+        if d and d not in seen:
+            seen.add(d)
+            binds.append("--bind " + d)
+    return " ".join(binds)
+VEP = ('apptainer exec --nv --cleanenv ' + _vep_binds() + ' ' + VEP_SIF + ' vep')
+
+# --- Clair3 -------------------------------------------------------------------
+CLAIR3_RUNNER   = config["clair3"]["sif"]
+CLAIR3_MODELDIR = config["clair3"]["model_dir"]
+CLAIR3_MODEL    = config["clair3"]["model"]
+
+# --- Reference: MMI index if it exists, otherwise fall back to FASTA ---------
+_ref_mmi_cfg = config.get("ref_mmi", "")
+ALIGN_REF = _ref_mmi_cfg if (_ref_mmi_cfg and os.path.isfile(_ref_mmi_cfg)) else config["ref_fasta"]
+
+if ALIGN_REF == config["ref_fasta"]:
+    print(f"[INFO] MMI index not found or not set — aligning against ref_fasta")
+else:
+    print(f"[INFO] Using MMI index: {ALIGN_REF}")
+
+# --- Start mode --------------------------------------------------------------
+START_FROM = config.get("start_from", "pod5")
+
+if START_FROM not in ("pod5", "fastq", "bam"):
+    raise ValueError(f"start_from must be 'pod5', 'fastq', or 'bam' — got '{START_FROM}'")
+
+# Validate required paths for each mode
+if START_FROM == "fastq":
+    _ef = config.get("existing_fastq", "")
+    if not _ef:
+        raise ValueError("start_from=fastq requires existing_fastq to be set in config")
+    if not os.path.isfile(_ef):
+        raise ValueError(f"existing_fastq not found: {_ef}")
+
+if START_FROM == "bam":
+    _eb = config.get("existing_bam", "")
+    if not _eb:
+        raise ValueError("start_from=bam requires existing_bam to be set in config")
+    if not os.path.isfile(_eb):
+        raise ValueError(f"existing_bam not found: {_eb}")
+
+print(f"[INFO] start_from={START_FROM}  sample={SAMPLE}")
+
+# ── Sequencing summary — optional (SignalScope v3) ───────────────────────
+# ── VEP cache completeness check ─────────────────────────────────────────────
+# Prevents the "cache extracted but incomplete" failure (e.g. interrupted tar):
+# VEP silently drops variants on missing chromosomes, causing cryptic downstream
+# errors. Fail fast here with a clear, actionable message instead.
+_vep_cache = config.get("vep", {}).get("cache", "")
+if _vep_cache and _os.path.isdir(_vep_cache):
+    _assembly = config.get("vep", {}).get("assembly", "GRCh38")
+    # find the species/version_assembly dir (e.g. homo_sapiens/116_GRCh38)
+    _hs = _os.path.join(_vep_cache, "homo_sapiens")
+    if _os.path.isdir(_hs):
+        _subdirs = [d for d in _os.listdir(_hs) if _assembly in d]
+        if _subdirs:
+            _cache_chr_dir = _os.path.join(_hs, _subdirs[0])
+            _expected = set(str(c) for c in range(1, 23)) | {"X", "Y"}
+            _present = set(d for d in _os.listdir(_cache_chr_dir)
+                           if d in _expected)
+            _missing = _expected - _present
+            if _missing:
+                raise ValueError(
+                    f"VEP cache appears INCOMPLETE at {_cache_chr_dir}\n"
+                    f"  Found {len(_present)}/24 chromosome directories; "
+                    f"missing: {', '.join(sorted(_missing, key=lambda x: (len(x), x)))}\n"
+                    f"  This usually means the cache tarball was not fully extracted "
+                    f"(e.g. interrupted). Re-extract the VEP cache completely:\n"
+                    f"    tar xzf homo_sapiens_vep_*_{_assembly}.tar.gz\n"
+                    f"  then re-run. See README 'External resources'."
+                )
+            print(f"[INFO] VEP cache complete: {len(_present)}/24 chromosomes")
+
+_seq_summary = config.get("sequencing_summary_file", "")
+HAS_SEQ_SUMMARY = bool(
+    _seq_summary and _os.path.isfile(_seq_summary) and _os.path.getsize(_seq_summary) > 200
+)
+if not HAS_SEQ_SUMMARY:
+    print("[INFO] No sequencing summary - metrics derived from BAM")
+
+
+# --- Active BED --------------------------------------------------------------
+TEST_MODE  = config.get("test_mode", False)
+ACTIVE_BED = config["test_bed"] if TEST_MODE else config["panel_bed"]
+
+# --- Ensure the panel BED is contig-order + coordinate sorted (robustness) ---
+# An unsorted BED can cause Clair3 to silently return zero candidates on some
+# contigs. Sort ACTIVE_BED against the reference .fai order so EVERY consumer
+# (Clair3, DeepVariant regions, panel filters) gets a sorted BED. Pure awk/sort,
+# no bedtools dependency.
+import subprocess as _sp_bedsort
+_raw_active_bed = ACTIVE_BED
+_active_fai = config["ref_fasta"] + ".fai"
+_harmonizer = _os.path.join(_os.path.dirname(workflow.snakefile), "scripts", "harmonize_and_sort_bed.py")
+if _os.path.isfile(_active_fai):
+    _sorted_active_bed = _os.path.join(
+        _os.path.dirname(_raw_active_bed) or ".",
+        _os.path.basename(_raw_active_bed).replace(".bed", "") + ".sorted.bed"
+    )
+    # Harmonise BED contig naming to the reference (chr/no-chr), then sort by
+    # reference contig order. Aborts loudly if the BED can't be reconciled
+    # (e.g. wrong assembly) instead of silently emitting an empty BED.
+    _sp_bedsort.run(
+        ["python3", _harmonizer, "--bed", _raw_active_bed,
+         "--fai", _active_fai, "--out", _sorted_active_bed],
+        check=True
+    )
+    ACTIVE_BED = _sorted_active_bed
+    print(f"[INFO] Panel BED harmonised + sorted -> {ACTIVE_BED}")
+else:
+    print(f"[WARN] {_active_fai} not found - using panel BED unsorted (Clair3 may miss contigs)")
+
+if TEST_MODE:
+    print(f"[INFO] test_mode=true — region={config['test_region']}  BED={ACTIVE_BED}")
+
+# --- Canonical file paths ----------------------------------------------------
+# Defined once here. Rules refer to these constants, not f-strings inline.
+
+FASTQ_GZ     = os.path.join(RAW_DIR, "fastq", f"{SAMPLE}.fastq.gz")
+BAM_ALL      = os.path.join(ALIGN_DIR, f"{SAMPLE}.bam")
+BAM_ALL_BAI  = os.path.join(ALIGN_DIR, f"{SAMPLE}.bam.bai")
+BAM_PRI      = os.path.join(ALIGN_DIR, f"{SAMPLE}.primary.bam")
+# --- Secondary alignment MSA recovery (MUC1 + PKD1) -------------------------
+RECOVERY_DIR     = os.path.join(SAMPLE_ROOT, "recovery")
+BAM_RECOVERED    = os.path.join(RECOVERY_DIR, f"{SAMPLE}.recovered.bam")
+BAM_RECOVERED_BAI = os.path.join(RECOVERY_DIR, f"{SAMPLE}.recovered.bam.bai")
+RECOVERY_TSV     = os.path.join(RECOVERY_DIR, f"{SAMPLE}.recovery_summary.tsv")
+
+# Sniffles panel VCF for VEP annotation
+SNIFFLES_VCF_PANEL = os.path.join(
+    config["samples_root"], SAMPLE,
+    "variants", "structural_variants", "sniffles", f"{SAMPLE}.sniffles.panel.vcf.gz"
+)
+SNIFFLES_VEP_TSV = os.path.join(
+    config["samples_root"], SAMPLE, "annotation", "vep", f"{SAMPLE}.sniffles.vep.tsv"
+)
+BAM_PRI_BAI  = os.path.join(ALIGN_DIR, f"{SAMPLE}.primary.bam.bai")
+# BAM used as input to all variant callers.
+# When pkd1_recovery=false, skip recovery and use primary BAM directly.
+
+# ── Pseudogene recovery config resolution (v2 + v3 compatible) ───────────
+# v3 format: pseudogene_recovery: {enabled: true, genes: [PKD1, PMS2]}
+# v2 format: pkd1_recovery: true
+_pr = config.get("pseudogene_recovery", {})
+if isinstance(_pr, dict) and "enabled" in _pr:
+    PSEUDOGENE_ENABLED = _pr.get("enabled", False)
+    PSEUDOGENE_GENES = _pr.get("genes", [])
+else:
+    PSEUDOGENE_ENABLED = config.get("pkd1_recovery", False)
+    PSEUDOGENE_GENES = ["PKD1"] if PSEUDOGENE_ENABLED else []
+
+if PSEUDOGENE_ENABLED:
+    print(f"[INFO] Pseudogene recovery ENABLED for: {', '.join(PSEUDOGENE_GENES)}")
+else:
+    print("[INFO] Pseudogene recovery DISABLED")
+
+BAM_FOR_CALLING     = BAM_RECOVERED     if PSEUDOGENE_ENABLED else BAM_PRI
+BAM_FOR_CALLING_BAI = BAM_RECOVERED_BAI if PSEUDOGENE_ENABLED else BAM_PRI_BAI
+
+FLAGSTAT     = os.path.join(QC_DIR, f"{SAMPLE}.flagstat.txt")
+PANEL_READS  = os.path.join(QC_DIR, f"{SAMPLE}.panel_read_count.txt")
+DEPTH_SUMM   = os.path.join(QC_DIR, f"{SAMPLE}.panel_depth_summary.txt")
+NANOPLOT_HTML = os.path.join(QC_DIR, "nanoplot", f"{SAMPLE}_NanoPlot-report.html")
+NANOPLOT_TXT  = os.path.join(QC_DIR, "nanoplot", f"{SAMPLE}_NanoStats.txt")
+
+MOSDEPTH_SUMMARY = os.path.join(COV_DIR, f"{SAMPLE}.mosdepth.summary.txt")
+MOSDEPTH_GLOBAL  = os.path.join(COV_DIR, f"{SAMPLE}.mosdepth.global.dist.txt")
+MOSDEPTH_REGION  = os.path.join(COV_DIR, f"{SAMPLE}.mosdepth.region.dist.txt")
+MOSDEPTH_BED_GZ  = os.path.join(COV_DIR, f"{SAMPLE}.regions.bed.gz")
+# REPORT mosdepth output — uses REPORT BED (COL4A3 and COL4A4 separate)
+MOSDEPTH_REPORT_BED_GZ = os.path.join(COV_DIR, f"{SAMPLE}.mosdepth_report.regions.bed.gz")
+MOSDEPTH_BED_CSI = os.path.join(COV_DIR, f"{SAMPLE}.regions.bed.gz.csi")
+
+CLAIR3_VCF_RAW   = os.path.join(CLAIR3_DIR, "merge_output.vcf.gz")
+CLAIR3_VCF_PANEL = os.path.join(VCF_IN_DIR, f"{SAMPLE}.clair3.panel.vcf.gz")
+CLAIR3_VCF_TBI   = os.path.join(VCF_IN_DIR, f"{SAMPLE}.clair3.panel.vcf.gz.tbi")
+
+
+SNIFFLES_VCF       = os.path.join(SNIFFLES_DIR, f"{SAMPLE}.sniffles.vcf.gz")
+SNIFFLES_TBI       = os.path.join(SNIFFLES_DIR, f"{SAMPLE}.sniffles.vcf.gz.tbi")
+SNIFFLES_VCF_PANEL = os.path.join(SNIFFLES_DIR, f"{SAMPLE}.sniffles.panel.vcf.gz")
+SNIFFLES_TBI_PANEL = os.path.join(SNIFFLES_DIR, f"{SAMPLE}.sniffles.panel.vcf.gz.tbi")
+
+# DeepVariant small variant calling (indel second caller)
+DEEPVARIANT_DIR  = os.path.join(VAR_DIR, "small_variants", "deepvariant")
+DV_VCF_GZ        = os.path.join(DEEPVARIANT_DIR, f"{SAMPLE}.deepvariant.vcf.gz")
+DV_VCF_TBI       = os.path.join(DEEPVARIANT_DIR, f"{SAMPLE}.deepvariant.vcf.gz.tbi")
+DV_VCF_PANEL     = os.path.join(VCF_IN_DIR,      f"{SAMPLE}.deepvariant.panel.vcf.gz")
+DV_VCF_PANEL_TBI = os.path.join(VCF_IN_DIR,      f"{SAMPLE}.deepvariant.panel.vcf.gz.tbi")
+DV_VEP_TSV       = os.path.join(VEP_DIR,         f"{SAMPLE}.deepvariant.vep.tsv")
+DV_VEP_STATS     = os.path.join(VEP_DIR,         f"{SAMPLE}.deepvariant.vep_stats.html")
+
+
+CONCORDANCE_TSV  = os.path.join(TABLES_DIR, f"{SAMPLE}.caller_concordance.tsv")
+CONCORDANCE_SUMM = os.path.join(TABLES_DIR, f"{SAMPLE}.concordance_summary.txt")
+
+VEP_TSV          = os.path.join(VEP_DIR, f"{SAMPLE}.clair3.vep.tsv")
+VEP_STATS        = os.path.join(VEP_DIR, f"{SAMPLE}.clair3.vep_stats.html")
+
+VERSIONS_TXT     = os.path.join(META_DIR, "software_versions.txt")
+
+# Report sub-directories
+REPORT_DIR       = os.path.join(SAMPLE_ROOT, "report")
+REPORT_DATA_DIR  = os.path.join(REPORT_DIR, "data")
+REPORT_PLOT_DIR  = os.path.join(REPORT_DIR, "plots")
+
+# Coverage report outputs
+COV_BY_GENE      = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.coverage_by_gene.tsv")
+COV_FINAL        = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.coverage.final.tsv")
+COV_SUMMARY      = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.coverage_summary.tsv")
+COV_BELOW10      = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.genes_below_10x.tsv")
+COV_BELOW20      = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.genes_below_20x.tsv")
+COV_PLOT         = os.path.join(REPORT_PLOT_DIR,  f"{SAMPLE}.coverage.png")
+
+# QC / run summary report outputs
+QC_THRESHOLDS_TSV  = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.qc_thresholds.tsv")
+RUN_SUMMARY_TSV    = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.run_summary.tsv")
+RUN_SUMMARY_DISP   = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.run_summary_display.tsv")
+SHARED_TARGETS_TSV   = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.shared_targets.tsv")
+QC_THRESHOLDS_PNG  = os.path.join(REPORT_PLOT_DIR,  f"{SAMPLE}.qc_thresholds.png")
+REPORT_HTML        = os.path.join(REPORT_DIR, "html", f"{SAMPLE}.report.html")
+
+# Logo — embedded in report header if file exists at this path
+LOGO_PATH = os.path.join(REPORT_DIR, "logo",
+                config.get("report", {}).get("logo_filename", "SignalScope_logo.png"))
+
+# SNV report sub-directory and output files
+REPORT_SNV_DIR      = os.path.join(REPORT_DIR, "snv")
+SNV_SUMMARY         = os.path.join(REPORT_SNV_DIR, f"{SAMPLE}.snv.summary.tsv")
+SNV_CLINVAR_SUMM    = os.path.join(REPORT_SNV_DIR, f"{SAMPLE}.snv.clinvar_summary.normalized.tsv")
+SNV_SHORTLIST_CTX   = os.path.join(REPORT_SNV_DIR,
+                          f"{SAMPLE}.snv.shortlist.with_gene_context.header.tsv")
+
+# IGV screenshots — manifest TSV (base64 PNGs), embedded in the HTML report
+IGV_DIR          = os.path.join(REPORT_DIR, "igv")
+IGV_MANIFEST     = os.path.join(IGV_DIR, f"{SAMPLE}.igv_manifest.tsv")
+
+# Sequencing performance (whole vs targeted) and tool versions
+TARGETED_BAM       = os.path.join(QC_DIR, "targeted", f"{SAMPLE}.targeted.bam")
+TARGETED_BAI       = os.path.join(QC_DIR, "targeted", f"{SAMPLE}.targeted.bam.bai")
+TARGETED_NANOSTATS = os.path.join(QC_DIR, "targeted", "nanoplot", f"{SAMPLE}_NanoStats.txt")
+SEQ_PERF_TSV       = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.sequencing_performance.tsv")
+TOOL_VERSIONS_TSV  = os.path.join(REPORT_DATA_DIR, f"{SAMPLE}.tool_versions.tsv")
+
+
+# =============================================================================
+# HELPER: create_sample_dirs
+#
+# Ensures the full directory skeleton exists before any rule writes output.
+# Called via a shell checkpoint at the start of the pipeline.
+# All rules also use mkdir -p in their own shell blocks for safety.
+# =============================================================================
+
+def get_all_sample_dirs(sample_root):
+    """Return the full list of directories that should exist for a sample."""
+    return [
+        os.path.join(sample_root, "raw", "pod5"),
+        os.path.join(sample_root, "raw", "fastq"),
+        os.path.join(sample_root, "alignments"),
+        os.path.join(sample_root, "qc", "nanoplot"),
+        os.path.join(sample_root, "coverage"),
+        os.path.join(sample_root, "variants", "small_variants", "clair3"),
+        os.path.join(sample_root, "variants", "small_variants", "deepvariant"),
+        os.path.join(sample_root, "variants", "structural_variants", "sniffles"),
+        os.path.join(sample_root, "annotation", "vcf_inputs"),
+        os.path.join(sample_root, "annotation", "vep"),
+        os.path.join(sample_root, "annotation", "clinvar"),
+        os.path.join(sample_root, "annotation", "tables"),
+        os.path.join(sample_root, "logs"),
+        os.path.join(sample_root, "tmp"),
+        os.path.join(sample_root, "failed_attempts"),
+        os.path.join(sample_root, "run_metadata"),
+        os.path.join(sample_root, "report", "data"),
+        os.path.join(sample_root, "report", "plots"),
+        os.path.join(sample_root, "report", "scripts"),
+        os.path.join(sample_root, "report", "html"),
+        os.path.join(sample_root, "report", "logs"),
+        os.path.join(sample_root, "report", "notes"),
+        os.path.join(sample_root, "report", "snv"),
+        os.path.join(sample_root, "qc", "targeted"),
+        os.path.join(sample_root, "qc", "targeted", "nanoplot"),
+    ]
+
+
+# =============================================================================
+# RULE ALL — Active pipeline targets
+#
+# All layers are active: core processing, variant analysis, and clinical interpretation/reporting.
+#
+# Start-mode logic:
+#   pod5  → FASTQ_GZ is a pipeline output (from dorado_basecall)
+#   fastq → FASTQ_GZ is a symlink/copy created by the handoff rule
+#   bam   → BAM_PRI is handed off directly; FASTQ_GZ is not required
+#
+# Note on ancient() inputs in generate_report_html:
+#   SNV outputs (snv_summary, snv_clinvar, snv_shortlist),
+#   seq_perf_tsv, and tool_versions_tsv are declared with ancient().
+#   This means if those files already exist, running --forcerun generate_report_html
+#   will NOT re-trigger snv_process, build_sequencing_performance, or
+#   record_tool_versions. This allows safe report previewing without
+#   rerunning expensive variant callers or targeted BAM analysis.
+# =============================================================================
+
+# Pre-compute start-mode-dependent targets so rule all contains only plain names
+# (Snakemake's parser rejects inline ternary expressions inside input: blocks)
+_FASTQ_TARGET = [] if START_FROM == "bam" else [FASTQ_GZ]
+_BAM_ALL_TARGETS = [] if START_FROM == "bam" else [BAM_ALL, BAM_ALL_BAI]
+
+
+rule all:
+    input:
+        # --- FASTQ: present for pod5 and fastq modes; absent for bam mode -----
+        _FASTQ_TARGET,
+
+        # --- Alignment --------------------------------------------------------
+        _BAM_ALL_TARGETS,
+        BAM_PRI,
+        BAM_PRI_BAI,
+
+        # --- QC ---------------------------------------------------------------
+        NANOPLOT_HTML,
+        FLAGSTAT,
+        PANEL_READS,
+        DEPTH_SUMM,
+
+        # --- Coverage ---------------------------------------------------------
+        MOSDEPTH_SUMMARY,
+        MOSDEPTH_GLOBAL,
+        MOSDEPTH_REGION,
+        MOSDEPTH_BED_GZ,
+        MOSDEPTH_BED_CSI,
+
+        # --- Software versions ------------------------------------------------
+        VERSIONS_TXT,
+
+        # --- Small variants ---------------------------------------------------
+        CLAIR3_VCF_RAW,
+        CLAIR3_VCF_PANEL,
+        CLAIR3_VCF_TBI,
+        DV_VCF_GZ,
+        DV_VCF_TBI,
+        DV_VCF_PANEL,
+        DV_VCF_PANEL_TBI,
+        DV_VEP_TSV,
+        DV_VEP_STATS,
+
+        # --- Structural variants — raw (permissive, min_size 30) -------------
+        SNIFFLES_VCF,
+        SNIFFLES_TBI,
+        # --- Structural variants — panel-filtered (use for analysis) ----------
+        SNIFFLES_VCF_PANEL,
+        SNIFFLES_TBI_PANEL,
+
+        # --- Concordance ------------------------------------------------------
+        CONCORDANCE_TSV,
+        CONCORDANCE_SUMM,
+
+        # --- VEP annotation ---------------------------------------------------
+        VEP_TSV,
+        VEP_STATS,
+
+        # --- Coverage report module ------------------------------------------
+        COV_BY_GENE,
+        COV_FINAL,
+        COV_PLOT,
+        QC_THRESHOLDS_TSV,
+        QC_THRESHOLDS_PNG,
+        RUN_SUMMARY_TSV,
+        RUN_SUMMARY_DISP,
+        SHARED_TARGETS_TSV,
+        REPORT_HTML,
+        IGV_MANIFEST,
+        SNV_SUMMARY,
+        SNV_CLINVAR_SUMM,
+        SNV_SHORTLIST_CTX,
+        SEQ_PERF_TSV,
+        TOOL_VERSIONS_TSV,
+
+
+
+# =============================================================================
+# LAYER 1 — CORE PIPELINE
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rule: create_sample_structure
+#
+# Creates the full directory skeleton for this sample before anything else runs.
+# This is a lightweight rule — it touches a sentinel file so Snakemake can
+# track it as a dependency.
+# -----------------------------------------------------------------------------
+rule create_sample_structure:
+    output:
+        sentinel = os.path.join(META_DIR, ".structure_created")
+    run:
+        import shutil as _shutil
+        for d in get_all_sample_dirs(SAMPLE_ROOT):
+            os.makedirs(d, exist_ok=True)
+        # Copy the SignalScope logo into the report so the HTML report shows branding.
+        _logo_name = config.get("report", {}).get("logo_filename", "SignalScope_logo.png")
+        _logo_src  = os.path.join(os.path.dirname(workflow.snakefile), "assets", _logo_name)
+        _logo_dst  = os.path.join(SAMPLE_ROOT, "report", "logo", _logo_name)
+        if os.path.isfile(_logo_src):
+            os.makedirs(os.path.dirname(_logo_dst), exist_ok=True)
+            _shutil.copyfile(_logo_src, _logo_dst)
+        # Write sentinel
+        with open(output.sentinel, "w") as f:
+            f.write(f"Sample directory structure created for: {SAMPLE}\n")
+
+
+# =============================================================================
+# INPUT SOURCE RULES — mutually exclusive by START_FROM
+#
+# Each output path has exactly ONE rule that can produce it.
+# Only the block matching START_FROM is parsed into the DAG.
+# The other two blocks are never evaluated by Snakemake.
+#
+#   START_FROM=pod5   → dorado_basecall  produces raw/fastq/{sample}.fastq.gz
+#   START_FROM=fastq  → fastq_handoff    produces raw/fastq/{sample}.fastq.gz
+#   START_FROM=bam    → bam_handoff      produces alignments/{sample}.primary.bam
+#
+# filter_primary (pod5/fastq only) and align (pod5/fastq only) are also
+# gated here so no rule tries to produce primary.bam when start_from=bam.
+# =============================================================================
+
+if START_FROM == "pod5":
+
+    # -------------------------------------------------------------------------
+    # Rule: dorado_basecall  [active only when start_from=pod5]
+    #
+    # Runs Dorado SUP on all POD5 files for this barcode.
+    # Pipes stdout through gzip — no intermediate uncompressed file written.
+    # Chemistry confirmed: dna_r10.4.1_e8.2_400bps_sup@v4.2.0
+    # -------------------------------------------------------------------------
+    rule dorado_basecall:
+        input:
+            sentinel = os.path.join(META_DIR, ".structure_created"),
+            pod5_dir = os.path.join(config["pod5_base"], "{sample}")
+        output:
+            fastq_gz = os.path.join(
+                config["samples_root"], "{sample}", "raw", "fastq", "{sample}.fastq.gz"
+            )
+        params:
+            dorado      = DORADO,
+            model       = config["dorado"]["model"],
+            extra_flags = config["dorado"]["extra_flags"]
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "dorado_basecall.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "dorado_basecall.stderr.log")
+        threads: config["threads"]
+        shell:
+            """
+            set -euo pipefail
+
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] dorado_basecall started" > {log.out}
+            echo "  sample   : {wildcards.sample}" >> {log.out}
+            echo "  pod5_dir : {input.pod5_dir}"   >> {log.out}
+            echo "  model    : {params.model}"     >> {log.out}
+
+            {params.dorado} basecaller \
+                {params.model} \
+                {input.pod5_dir} \
+                {params.extra_flags} \
+                2>> {log.err} \
+            | gzip -c > {output.fastq_gz}
+
+            READ_COUNT=$(zcat {output.fastq_gz} | grep -c '^@' || true)
+            echo "  reads written : $READ_COUNT"                           >> {log.out}
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] dorado_basecall complete" >> {log.out}
+            """
+
+    # -------------------------------------------------------------------------
+    # Rule: align  [pod5 variant — input is dorado output]
+    # -------------------------------------------------------------------------
+    rule align:
+        input:
+            fastq_gz = os.path.join(
+                config["samples_root"], "{sample}", "raw", "fastq", "{sample}.fastq.gz"
+            ),
+            ref = ALIGN_REF
+        output:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.bam"
+            )
+        params:
+            minimap2    = MINIMAP2,
+            samtools    = SAMTOOLS,
+            test_mode   = TEST_MODE,
+            test_region = config.get("test_region", "")
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "align.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "align.stderr.log")
+        threads: config["threads"]
+        shell:
+            """
+            set -euo pipefail
+            mkdir -p $(dirname {output.bam})
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] align started"  > {log.out}
+            echo "  ref       : {input.ref}"       >> {log.out}
+            echo "  test_mode : {params.test_mode}" >> {log.out}
+
+            if [ "{params.test_mode}" = "True" ]; then
+                {params.minimap2} -t {threads} -ax map-ont {input.ref} {input.fastq_gz} \
+                    2>> {log.err} \
+                | {params.samtools} sort -@ {threads} \
+                    2>> {log.err} \
+                | {params.samtools} view -@ {threads} -b "{params.test_region}" \
+                    -o {output.bam} 2>> {log.err}
+            else
+                {params.minimap2} -t {threads} -ax map-ont {input.ref} {input.fastq_gz} \
+                    2>> {log.err} \
+                | {params.samtools} sort -@ {threads} -o {output.bam} 2>> {log.err}
+            fi
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] align complete" >> {log.out}
+            """
+
+    # -------------------------------------------------------------------------
+    # Rule: filter_primary  [pod5 variant]
+    # -------------------------------------------------------------------------
+    rule filter_primary:
+        input:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.bam"
+            )
+        output:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.primary.bam"
+            )
+        params:
+            samtools = SAMTOOLS
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "filter_primary.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "filter_primary.stderr.log")
+        threads: config["threads"]
+        shell:
+            """
+            set -euo pipefail
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] filter_primary started" > {log.out}
+            echo "  flag: -F 0x800 (removes supplementary only; keeps secondary for PKD1/MUC1 recovery)"  >> {log.out}
+            {params.samtools} view -@ {threads} -b -F 0x800 {input.bam} \
+                2>> {log.err} \
+            | {params.samtools} sort -@ {threads} -o {output.bam} \
+                2>> {log.err}
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] filter_primary complete" >> {log.out}
+            """
+
+
+elif START_FROM == "fastq":
+
+    # -------------------------------------------------------------------------
+    # Rule: fastq_handoff  [active only when start_from=fastq]
+    #
+    # Produces the canonical raw/fastq/{sample}.fastq.gz from an existing
+    # FASTQ file without rerunning Dorado.
+    #
+    # Handles two cases automatically, detected from the source file extension:
+    #
+    #   source ends with .fastq.gz
+    #     -> create a symlink (no data copied, instant)
+    #
+    #   source ends with .fastq  (e.g. barcode04.sup.Q10.fastq)
+    #     -> gzip it into the canonical location
+    #     -> original file is NOT modified or moved
+    #
+    # After this rule, every downstream rule sees only the canonical path.
+    # -------------------------------------------------------------------------
+    rule fastq_handoff:
+        input:
+            sentinel    = os.path.join(META_DIR, ".structure_created"),
+            existing_fq = config["existing_fastq"]
+        output:
+            fastq_gz = os.path.join(
+                config["samples_root"], "{sample}", "raw", "fastq", "{sample}.fastq.gz"
+            )
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "fastq_handoff.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "fastq_handoff.stderr.log")
+        shell:
+            """
+            set -euo pipefail
+            mkdir -p $(dirname {output.fastq_gz})
+
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] fastq_handoff started" > {log.out}
+            echo "  source : {input.existing_fq}" >> {log.out}
+            echo "  target : {output.fastq_gz}"   >> {log.out}
+
+            SOURCE="{input.existing_fq}"
+
+            if [[ "$SOURCE" == *.fastq.gz ]]; then
+                # Already gzipped — symlink directly, no data movement
+                echo "  action : symlink (.fastq.gz source)" >> {log.out}
+                ln -sf "$SOURCE" {output.fastq_gz}
+
+            elif [[ "$SOURCE" == *.fastq ]]; then
+                # Plain FASTQ — compress into canonical location
+                # Original file is left untouched
+                echo "  action : gzip (.fastq source)" >> {log.out}
+                gzip -c "$SOURCE" > {output.fastq_gz} 2>> {log.err}
+                READ_COUNT=$(zcat {output.fastq_gz} | grep -c "^@" || true)
+                echo "  reads  : $READ_COUNT"         >> {log.out}
+
+            else
+                echo "[ERROR] existing_fastq must end in .fastq or .fastq.gz" >&2
+                echo "  received: $SOURCE" >&2
+                exit 1
+            fi
+
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] fastq_handoff complete" >> {log.out}
+            """
+
+    # -------------------------------------------------------------------------
+    # Rule: align  [fastq variant — input is the handed-off FASTQ symlink]
+    # -------------------------------------------------------------------------
+    rule align:
+        input:
+            fastq_gz = os.path.join(
+                config["samples_root"], "{sample}", "raw", "fastq", "{sample}.fastq.gz"
+            ),
+            ref = ALIGN_REF
+        output:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.bam"
+            )
+        params:
+            minimap2    = MINIMAP2,
+            samtools    = SAMTOOLS,
+            test_mode   = TEST_MODE,
+            test_region = config.get("test_region", "")
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "align.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "align.stderr.log")
+        threads: config["threads"]
+        shell:
+            """
+            set -euo pipefail
+            mkdir -p $(dirname {output.bam})
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] align started"  > {log.out}
+            echo "  ref       : {input.ref}"        >> {log.out}
+            echo "  test_mode : {params.test_mode}" >> {log.out}
+
+            if [ "{params.test_mode}" = "True" ]; then
+                {params.minimap2} -t {threads} -ax map-ont {input.ref} {input.fastq_gz} \
+                    2>> {log.err} \
+                | {params.samtools} sort -@ {threads} \
+                    2>> {log.err} \
+                | {params.samtools} view -@ {threads} -b "{params.test_region}" \
+                    -o {output.bam} 2>> {log.err}
+            else
+                {params.minimap2} -t {threads} -ax map-ont {input.ref} {input.fastq_gz} \
+                    2>> {log.err} \
+                | {params.samtools} sort -@ {threads} -o {output.bam} 2>> {log.err}
+            fi
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] align complete" >> {log.out}
+            """
+
+    # -------------------------------------------------------------------------
+    # Rule: filter_primary  [fastq variant]
+    # -------------------------------------------------------------------------
+    rule filter_primary:
+        input:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.bam"
+            )
+        output:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.primary.bam"
+            )
+        params:
+            samtools = SAMTOOLS
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "filter_primary.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "filter_primary.stderr.log")
+        threads: config["threads"]
+        shell:
+            """
+            set -euo pipefail
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] filter_primary started" > {log.out}
+            echo "  flag: -F 0x800 (removes supplementary only; keeps secondary for PKD1/MUC1 recovery)"  >> {log.out}
+            {params.samtools} view -@ {threads} -b -F 0x800 {input.bam} \
+                2>> {log.err} \
+            | {params.samtools} sort -@ {threads} -o {output.bam} \
+                2>> {log.err}
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] filter_primary complete" >> {log.out}
+            """
+
+
+elif START_FROM == "bam":
+
+    # -------------------------------------------------------------------------
+    # Rule: bam_handoff  [active only when start_from=bam]
+    #
+    # Symlinks an existing primary-filtered BAM into the canonical location.
+    # The BAM must already be filtered (primary only) and indexed.
+    # align and filter_primary are NOT defined in this mode.
+    # -------------------------------------------------------------------------
+    rule bam_handoff:
+        input:
+            sentinel     = os.path.join(META_DIR, ".structure_created"),
+            existing_bam = config["existing_bam"]
+        output:
+            bam = os.path.join(
+                config["samples_root"], "{sample}", "alignments", "{sample}.bam"
+            )
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "bam_handoff.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "bam_handoff.stderr.log")
+        shell:
+            """
+            set -euo pipefail
+            mkdir -p $(dirname {output.bam})
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] bam_handoff started" > {log.out}
+            echo "  source (all-reads): {input.existing_bam}" >> {log.out}
+            ln -sf {input.existing_bam} {output.bam}
+            if [ -f "{input.existing_bam}.bai" ]; then
+                ln -sf {input.existing_bam}.bai {output.bam}.bai
+            fi
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] bam_handoff complete" >> {log.out}
+            """
+
+    rule filter_primary:
+        input:
+            bam = os.path.join(config["samples_root"], "{sample}", "alignments", "{sample}.bam")
+        output:
+            bam = os.path.join(config["samples_root"], "{sample}", "alignments", "{sample}.primary.bam")
+        params:
+            samtools = SAMTOOLS
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "logs", "filter_primary.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "logs", "filter_primary.stderr.log")
+        threads: config["threads"]
+        shell:
+            """
+            set -euo pipefail
+            echo "filter_primary started" > {log.out}
+            {params.samtools} view -@ {threads} -b -F 0x800 {input.bam} 2>> {log.err} | {params.samtools} sort -@ {threads} -o {output.bam} 2>> {log.err}
+            echo "filter_primary complete" >> {log.out}
+            """
+
+
+
+
+# =============================================================================
+# SHARED RULES — active for all start modes that produce a BAM
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rule: index_all_bam
+#
+# Indexes the sorted all-reads BAM.
+# Only relevant for pod5 and fastq modes (where an all-reads BAM exists).
+# In bam mode this rule is never triggered (no all-reads BAM is produced).
+# -----------------------------------------------------------------------------
+rule index_all_bam:
+    input:
+        bam = os.path.join(
+            config["samples_root"], "{sample}", "alignments", "{sample}.bam"
+        )
+    output:
+        bai = os.path.join(
+            config["samples_root"], "{sample}", "alignments", "{sample}.bam.bai"
+        )
+    params:
+        samtools = SAMTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "index_all_bam.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "index_all_bam.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Indexing all-reads BAM" > {log.out}
+        {params.samtools} index -@ {threads} {input.bam} 2>> {log.err}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Done" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: index_primary_bam
+#
+# Indexes the primary-only BAM.
+# Required by Clair3, mosdepth, and all downstream tools.
+# -----------------------------------------------------------------------------
+rule index_primary_bam:
+    input:
+        bam = os.path.join(
+            config["samples_root"], "{sample}", "alignments", "{sample}.primary.bam"
+        )
+    output:
+        bai = os.path.join(
+            config["samples_root"], "{sample}", "alignments", "{sample}.primary.bam.bai"
+        )
+    params:
+        samtools = SAMTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "index_primary_bam.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "index_primary_bam.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Indexing primary BAM" > {log.out}
+        {params.samtools} index -@ {threads} {input.bam} 2>> {log.err}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Done" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: nanoplot_qc
+#
+# Alignment QC visualisations using NanoPlot run on the primary BAM.
+# Using --bam produces alignment-aware stats (identity, coverage etc.)
+# and works correctly regardless of start_from mode.
+# -----------------------------------------------------------------------------
+rule nanoplot_qc:
+    input:
+        bam = BAM_PRI,
+        bai = BAM_PRI_BAI
+    output:
+        html    = os.path.join(
+            config["samples_root"], "{sample}", "qc", "nanoplot", "{sample}_NanoPlot-report.html"
+        ),
+        summary = os.path.join(
+            config["samples_root"], "{sample}", "qc", "nanoplot", "{sample}_NanoStats.txt"
+        )
+    params:
+        nanoplot = NANOPLOT,
+        outdir   = os.path.join(config["samples_root"], "{sample}", "qc", "nanoplot"),
+        prefix   = "{sample}_"
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "nanoplot.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "nanoplot.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p {params.outdir}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] nanoplot_qc started" > {log.out}
+        echo "  BAM    : {input.bam}"     >> {log.out}
+        echo "  outdir : {params.outdir}" >> {log.out}
+
+        {params.nanoplot} \
+            --bam {input.bam} \
+            --outdir {params.outdir} \
+            --prefix {params.prefix} \
+            --threads {threads} \
+            > {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] nanoplot_qc complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: basic_qc
+#
+# Three alignment QC checks from one rule (all share the same BAM):
+#   1. flagstat    — overall alignment statistics
+#   2. panel_reads — reads overlapping the CKD panel BED
+#   3. depth_summ  — mean and max depth across panel positions
+# -----------------------------------------------------------------------------
+rule basic_qc:
+    input:
+        bam = BAM_PRI,
+        bai = BAM_PRI_BAI,
+        bed = ACTIVE_BED
+    output:
+        flagstat    = os.path.join(config["samples_root"], "{sample}", "qc", "{sample}.flagstat.txt"),
+        panel_reads = os.path.join(config["samples_root"], "{sample}", "qc", "{sample}.panel_read_count.txt"),
+        depth_summ  = os.path.join(config["samples_root"], "{sample}", "qc", "{sample}.panel_depth_summary.txt")
+    params:
+        samtools = SAMTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "basic_qc.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "basic_qc.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p $(dirname {output.flagstat})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] basic_qc started" > {log.out}
+        echo "  BAM : {input.bam}" >> {log.out}
+        echo "  BED : {input.bed}" >> {log.out}
+
+        echo "--- flagstat ---" >> {log.out}
+        {params.samtools} flagstat -@ {threads} {input.bam} \
+            > {output.flagstat} 2>> {log.err}
+        cat {output.flagstat} >> {log.out}
+
+        echo "--- panel read count ---" >> {log.out}
+        {params.samtools} view -@ {threads} -L {input.bed} -c {input.bam} \
+            > {output.panel_reads} 2>> {log.err}
+        echo "  reads on panel: $(cat {output.panel_reads})" >> {log.out}
+
+        echo "--- panel depth summary ---" >> {log.out}
+        {params.samtools} depth -b {input.bed} {input.bam} \
+            2>> {log.err} \
+        | awk '{{sum+=$3; n++; if($3>max) max=$3}} \
+               END{{print "mean=" sum/n, "max=" max, "positions=" n}}' \
+            > {output.depth_summ}
+        cat {output.depth_summ} >> {log.out}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] basic_qc complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: mosdepth_coverage
+#
+# Per-gene and per-region coverage analysis across the CKD panel.
+# mosdepth writes several output files automatically; all are declared.
+# -----------------------------------------------------------------------------
+rule mosdepth_coverage:
+    input:
+        bam = BAM_PRI,
+        bai = BAM_PRI_BAI,
+        bed = config["panel_bed"]
+    output:
+        summary = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth.summary.txt"),
+        global_ = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth.global.dist.txt"),
+        region  = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth.region.dist.txt"),
+        bed_gz  = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.regions.bed.gz"),
+        bed_csi = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.regions.bed.gz.csi")
+    params:
+        mosdepth = MOSDEPTH,
+        prefix   = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}")
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "mosdepth.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "mosdepth.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p $(dirname {params.prefix})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] mosdepth_coverage started" > {log.out}
+        echo "  BAM    : {input.bam}"     >> {log.out}
+        echo "  prefix : {params.prefix}" >> {log.out}
+
+        {params.mosdepth} \
+            --by {input.bed} \
+            --threads {threads} \
+            {params.prefix} \
+            {input.bam} \
+            > {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] mosdepth_coverage complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: mosdepth_coverage_report
+#
+# Second mosdepth run, using the REPORT BED (33 lines, COL4A3 and COL4A4
+# separate). Used as input to coverage_build_tables so per-gene depth
+# reporting shows COL4A3 and COL4A4 as independent measurements rather
+# than a single merged interval split into two duplicated rows.
+# -----------------------------------------------------------------------------
+rule mosdepth_coverage_report:
+    input:
+        bam = BAM_PRI,
+        bai = BAM_PRI_BAI,
+        bed = config["report_bed"]
+    output:
+        summary = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth_report.mosdepth.summary.txt"),
+        global_ = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth_report.mosdepth.global.dist.txt"),
+        region  = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth_report.mosdepth.region.dist.txt"),
+        bed_gz  = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth_report.regions.bed.gz"),
+        bed_csi = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth_report.regions.bed.gz.csi")
+    params:
+        mosdepth = MOSDEPTH,
+        prefix   = os.path.join(config["samples_root"], "{sample}", "coverage", "{sample}.mosdepth_report")
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "mosdepth_report.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "mosdepth_report.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p $(dirname {params.prefix})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] mosdepth_coverage_report started" > {log.out}
+        echo "  BAM    : {input.bam}"     >> {log.out}
+        echo "  prefix : {params.prefix}" >> {log.out}
+        echo "  BED    : {input.bed}"     >> {log.out}
+
+        {params.mosdepth} \
+            --by {input.bed} \
+            --threads {threads} \
+            {params.prefix} \
+            {input.bam} \
+            > {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] mosdepth_coverage_report complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: record_versions
+#
+# Captures tool version strings for reproducibility auditing.
+# Runs automatically with every pipeline execution.
+# -----------------------------------------------------------------------------
+rule record_versions:
+    input:
+        sentinel = os.path.join(META_DIR, ".structure_created")
+    output:
+        txt = os.path.join(
+            config["samples_root"], "{sample}", "run_metadata", "software_versions.txt"
+        )
+    params:
+        dorado   = DORADO,
+        minimap2 = MINIMAP2,
+        samtools = SAMTOOLS,
+        bcftools = BCFTOOLS,
+        clair3   = CLAIR3_RUNNER,
+        mosdepth = MOSDEPTH,
+        nanoplot = NANOPLOT,
+        model    = CLAIR3_MODEL
+    log:
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "record_versions.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        {{
+            echo "# CKD pipeline software versions"
+            echo "# Sample       : {wildcards.sample}"
+            echo "# Date         : $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "# Clair3 model : {params.model}"
+            echo ""
+            echo "=== dorado ==="
+            {params.dorado} --version 2>&1 || echo "unavailable"
+            echo ""
+            echo "=== minimap2 ==="
+            {params.minimap2} --version 2>&1 || echo "unavailable"
+            echo ""
+            echo "=== samtools ==="
+            {params.samtools} --version 2>&1 | head -2
+            echo ""
+            echo "=== bcftools ==="
+            {params.bcftools} --version 2>&1 | head -2
+            echo ""
+            echo "=== clair3 ==="
+            bash {params.clair3} --version 2>&1 || echo "unavailable"
+            echo ""
+            echo "=== mosdepth ==="
+            {params.mosdepth} --version 2>&1 || echo "unavailable"
+            echo ""
+            echo "=== nanoplot ==="
+            {params.nanoplot} --version 2>&1 || echo "unavailable"
+            echo ""
+            echo "=== snakemake ==="
+            snakemake --version 2>&1 || echo "unavailable"
+        }} > {output.txt} 2>> {log.err}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: clair3_call
+#
+# Small variant calling (SNV + indel) on the primary BAM.
+# All parameters confirmed from the validated barcode06 manual run.
+# Model: r1041_e82_400bps_sup_v420 (chemistry-matched to R10.4.1)
+# -----------------------------------------------------------------------------
+
+
+# =============================================================================
+# Rule: pkd1_muc1_recovery
+# Recovers genuine PKD1 and MUC1 reads from secondary alignments.
+# PKD1: competitive alignment vs real PKD1 + 6 pseudogenes.
+# MUC1: VNTR-sensitive realignment (k=7, w=3).
+# Confirmed reads added to primary BAM -> BAM_RECOVERED.
+# All variant callers run on BAM_RECOVERED.
+# =============================================================================
+if config.get("pkd1_recovery", True):
+    rule pseudogene_recovery:
+        input:
+            bam_all     = os.path.join(ALIGN_DIR, f"{SAMPLE}.bam"),
+            bam_all_bai = os.path.join(ALIGN_DIR, f"{SAMPLE}.bam.bai"),
+            bam_pri     = BAM_PRI,
+            bam_pri_bai = BAM_PRI_BAI,
+            ref         = config["ref_fasta"],
+            panel_bed   = ACTIVE_BED
+        output:
+            recovered_bam = BAM_RECOVERED,
+            recovered_bai = BAM_RECOVERED_BAI,
+            recovery_tsv  = RECOVERY_TSV
+        log:
+            out = os.path.join(RECOVERY_DIR, "logs", "pkd1_muc1_recovery.stdout.log"),
+            err = os.path.join(RECOVERY_DIR, "logs", "pkd1_muc1_recovery.stderr.log")
+        threads: 8
+        shell:
+            """
+            set -euo pipefail
+            mkdir -p {RECOVERY_DIR}/tmp $(dirname {log.out})
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] pkd1_muc1_recovery started" > {log.out}
+            python3 {SCRIPTS}/pseudogene_recovery.py \
+                --bam_all   {input.bam_all} \
+                --bam_pri   {input.bam_pri} \
+                --ref       {input.ref} \
+                --panel_bed {input.panel_bed} \
+                --out_dir   {RECOVERY_DIR} \
+                --sample    {SAMPLE} \
+                --threads   {threads} \
+                --samtools  {SAMTOOLS} \
+                --minimap2  {MINIMAP2} \
+                >> {log.out} 2>> {log.err}
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] pkd1_muc1_recovery complete" >> {log.out}
+            """
+    
+rule clair3_call:
+    input:
+        bam = BAM_FOR_CALLING,
+        bai = BAM_FOR_CALLING_BAI,
+        ref = config["ref_fasta"],
+        bed = ACTIVE_BED
+    output:
+        vcf = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "small_variants", "clair3", "merge_output.vcf.gz"
+        )
+    params:
+        sif        = config["clair3"]["sif"],
+        model_path = os.path.join(CLAIR3_MODELDIR, CLAIR3_MODEL),
+        model_name = CLAIR3_MODEL,
+        outdir     = os.path.join(
+            config["samples_root"], "{sample}", "variants", "small_variants", "clair3"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "clair3.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "clair3.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p {params.outdir}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] clair3_call started" > {log.out}
+        echo "  sample : {wildcards.sample}"  >> {log.out}
+        echo "  BAM    : {input.bam}"         >> {log.out}
+        echo "  BED    : {input.bed}"         >> {log.out}
+        echo "  model  : {params.model_name}" >> {log.out}
+
+        ABS_REF=$(realpath {input.ref})
+        ABS_BAM=$(realpath {input.bam})
+        ABS_BED=$(realpath {input.bed})
+        ABS_OUT=$(realpath {params.outdir})
+        ABS_MODEL=$(realpath {params.model_path})
+        export APPTAINER_TMPDIR=$ABS_OUT/apptainer_tmp
+        export APPTAINER_CACHEDIR=$ABS_OUT/apptainer_tmp
+        mkdir -p $ABS_OUT/apptainer_tmp
+        apptainer exec \
+            --nv \
+            --no-home \
+            --cleanenv \
+            --home /tmp \
+            --bind $(dirname $ABS_REF) \
+            --bind $(dirname $ABS_BED) \
+            --bind $(dirname $ABS_BAM) \
+            --bind $ABS_OUT \
+            --bind $ABS_MODEL \
+            {params.sif} \
+            /opt/bin/run_clair3.sh \
+                --bam_fn=$ABS_BAM \
+                --ref_fn=$ABS_REF \
+                --threads={threads} \
+                --platform=ont \
+                --model_path=$ABS_MODEL \
+                --output=$ABS_OUT \
+                --bed_fn=$ABS_BED \
+                --use_gpu \
+                --qual=2 \
+                --snp_min_af=0.08 \
+                --indel_min_af=0.15 \
+                --min_mq=5 \
+                --min_coverage=2 \
+            >> {log.out} 2>> {log.err}
+
+        VARIANT_COUNT=$(zcat {output.vcf} | grep -vc '^#' || echo "unknown")
+        echo "  raw variants called : $VARIANT_COUNT" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] clair3_call complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: panel_filter_clair3
+#
+# Restricts Clair3 VCF to panel BED regions.
+# Output goes to annotation/vcf_inputs/ — the authoritative input for VEP.
+# Always uses full panel_bed (not ACTIVE_BED) so test-mode runs are filtered
+# to the real panel, not the test region.
+# -----------------------------------------------------------------------------
+rule panel_filter_clair3:
+    input:
+        vcf = CLAIR3_VCF_RAW,
+        bed = config["panel_bed"]
+    output:
+        vcf = os.path.join(
+            config["samples_root"], "{sample}",
+            "annotation", "vcf_inputs", "{sample}.clair3.panel.vcf.gz"
+        ),
+        tbi = os.path.join(
+            config["samples_root"], "{sample}",
+            "annotation", "vcf_inputs", "{sample}.clair3.panel.vcf.gz.tbi"
+        )
+    params:
+        bcftools = BCFTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "panel_filter_clair3.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "panel_filter_clair3.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p $(dirname {output.vcf})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] panel_filter_clair3 started" > {log.out}
+        echo "  input : {input.vcf}" >> {log.out}
+        echo "  BED   : {input.bed}" >> {log.out}
+
+        {params.bcftools} view -R {input.bed} {input.vcf} \
+            2>> {log.err} \
+        | {params.bcftools} sort \
+            2>> {log.err} \
+        | bgzip -c > {output.vcf} \
+            2>> {log.err}
+
+        tabix -p vcf {output.vcf} 2>> {log.err}
+
+        VARIANT_COUNT=$(zcat {output.vcf} | grep -vc '^#' || echo "unknown")
+        echo "  variants after panel filter : $VARIANT_COUNT" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] panel_filter_clair3 complete" >> {log.out}
+        """
+
+
+
+# =============================================================================
+# Rule: cutesv_call
+#
+# Calls structural variants using CuteSV 2.1.3.
+# Run genome-wide on BAM_RECOVERED, then filtered to panel BED.
+# FORMAT: GT:DR:DV:PL:GQ — proper genotype and read support fields.
+# Self-filters low-confidence calls with q5 flag.
+# Replaces SVIM which lacked FORMAT columns (GT=N/A, depth=0).
+# =============================================================================
+# Rule: sniffles_call
+#
+# Calls structural variants using Sniffles2.
+# Run genome-wide on recovered BAM, then panel-filtered.
+# =============================================================================
+rule sniffles_call:
+    input:
+        bam = BAM_FOR_CALLING,
+        bai = BAM_FOR_CALLING_BAI,
+        bed = config["panel_bed"]
+    output:
+        vcf_gz = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "structural_variants", "sniffles", "{sample}.sniffles.vcf.gz"
+        ),
+        tbi = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "structural_variants", "sniffles", "{sample}.sniffles.vcf.gz.tbi"
+        ),
+        panel = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "structural_variants", "sniffles", "{sample}.sniffles.panel.vcf.gz"
+        ),
+        panel_tbi = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "structural_variants", "sniffles", "{sample}.sniffles.panel.vcf.gz.tbi"
+        )
+    params:
+        sniffles   = SNIFFLES,
+        bcftools   = BCFTOOLS,
+        minsvlen   = config["sniffles"]["minsvlen"],
+        minsupport = config["sniffles"]["minsupport"],
+        workdir    = os.path.join(
+            config["samples_root"], "{sample}", "variants", "structural_variants", "sniffles"
+        ),
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "sniffles.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "sniffles.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p {params.workdir}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] sniffles_call started" > {log.out}
+        echo "  sample : {wildcards.sample}" >> {log.out}
+        echo "  BAM    : {input.bam}"        >> {log.out}
+
+        {params.sniffles} \
+            --input {input.bam} \
+            --vcf {params.workdir}/{wildcards.sample}.sniffles.raw.vcf \
+            --threads {threads} \
+            --minsvlen {params.minsvlen} \
+            --minsupport {params.minsupport} \
+            2>> {log.err}
+
+        bgzip -c {params.workdir}/{wildcards.sample}.sniffles.raw.vcf > {output.vcf_gz} 2>> {log.err}
+        tabix -p vcf {output.vcf_gz} 2>> {log.err}
+        rm -f {params.workdir}/{wildcards.sample}.sniffles.raw.vcf
+
+        {params.bcftools} view \
+            --regions-file {input.bed} \
+            {output.vcf_gz} \
+            -O z -o {output.panel} 2>> {log.err}
+        tabix -p vcf {output.panel} 2>> {log.err}
+
+        RAW=$(zcat {output.vcf_gz} | grep -vc '^#' || true)
+        PANEL=$(zcat {output.panel} | grep -vc '^#' || true)
+        echo "  SVs genome-wide : $RAW"   >> {log.out}
+        echo "  SVs panel       : $PANEL" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] sniffles_call complete" >> {log.out}
+        """
+# =============================================================================
+rule cutesv_call:
+    input:
+        bam = BAM_FOR_CALLING,
+        bai = BAM_FOR_CALLING_BAI,
+        ref = config["ref_fasta"],
+        bed = config["panel_bed"]
+    output:
+        vcf_gz    = os.path.join(config["samples_root"], "{sample}", "variants", "structural_variants", "cutesv", "{sample}.cutesv.vcf.gz"),
+        tbi       = os.path.join(config["samples_root"], "{sample}", "variants", "structural_variants", "cutesv", "{sample}.cutesv.vcf.gz.tbi"),
+        panel     = os.path.join(config["samples_root"], "{sample}", "variants", "structural_variants", "cutesv", "{sample}.cutesv.panel.vcf.gz"),
+        panel_tbi = os.path.join(config["samples_root"], "{sample}", "variants", "structural_variants", "cutesv", "{sample}.cutesv.panel.vcf.gz.tbi")
+    params:
+        cutesv  = config["tools"]["cutesv"],
+        bcftools = BCFTOOLS,
+        workdir  = os.path.join(CUTESV_DIR, "tmp")
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "cutesv.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "cutesv.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p {params.workdir}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] cutesv_call started" > {log.out}
+        echo "  sample : {wildcards.sample}" >> {log.out}
+        echo "  BAM    : {input.bam}"        >> {log.out}
+
+        {params.cutesv} \
+            {input.bam} \
+            {input.ref} \
+            {params.workdir}/{wildcards.sample}.cutesv.raw.vcf \
+            {params.workdir} \
+            --threads {threads} \
+            --sample  {wildcards.sample} \
+            --genotype \
+            --min_support 2 \
+            --min_size    50 \
+            -L 5000000 \
+            >> {log.out} 2>> {log.err}
+
+        bgzip -c {params.workdir}/{wildcards.sample}.cutesv.raw.vcf > {output.vcf_gz} 2>> {log.err}
+        tabix -p vcf {output.vcf_gz} 2>> {log.err}
+
+        {params.bcftools} view \
+            --regions-file {input.bed} \
+            --apply-filters PASS \
+            {output.vcf_gz} \
+            -O z -o {output.panel} 2>> {log.err}
+        tabix -p vcf {output.panel} 2>> {log.err}
+
+        RAW=$(zcat {output.vcf_gz} | grep -vc '^#' || true)
+        PANEL=$(zcat {output.panel} | grep -vc '^#' || true)
+        echo "  SVs genome-wide : $RAW"   >> {log.out}
+        echo "  SVs panel PASS  : $PANEL" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] cutesv_call complete" >> {log.out}
+        """
+
+
+rule caller_concordance:
+    input:
+        clair3   = CLAIR3_VCF_PANEL,
+        deepvariant = DV_VCF_PANEL   # panel-filtered — matches Clair3 scope
+    output:
+        table   = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "tables",
+            "{sample}.caller_concordance.tsv"
+        ),
+        summary = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "tables",
+            "{sample}.concordance_summary.txt"
+        )
+    params:
+        bcftools = BCFTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "concordance.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "concordance.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p $(dirname {output.table})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] caller_concordance started" > {log.out}
+
+        TMPDIR=$(mktemp -d)
+
+        {params.bcftools} isec \
+            -p $TMPDIR \
+            {input.clair3} \
+            {input.deepvariant} \
+            2>> {log.err}
+
+        # bcftools isec layout:
+        #   0000.vcf — Clair3 private
+        #   0002.vcf — Clair3 records at shared sites
+
+        CLAIR3_TOTAL=$(zcat {input.clair3}   | grep -vc '^#' || echo 0)
+        DV_TOTAL=$(zcat {input.deepvariant} | grep -vc '^#' || echo 0)
+        SHARED=$(grep -vc '^#' $TMPDIR/0002.vcf   || echo 0)
+        CLAIR3_ONLY=$(grep -vc '^#' $TMPDIR/0000.vcf  || echo 0)
+        DV_ONLY=$(grep -vc '^#' $TMPDIR/0001.vcf || echo 0)
+
+        {{
+            echo "# Caller concordance — {wildcards.sample}"
+            echo "Clair3_total    $CLAIR3_TOTAL"
+            echo "DeepVariant_total  $DV_TOTAL"
+            echo "Shared          $SHARED"
+            echo "Clair3_only     $CLAIR3_ONLY"
+            echo "DeepVariant_only   $DV_ONLY"
+        }} | tee {output.summary} >> {log.out}
+
+        echo -e "CHROM\tPOS\tREF\tALT\tIN_CLAIR3\tIN_DEEPVARIANT\tCALLER_SUPPORT" \
+            > {output.table}
+
+        grep -v '^#' $TMPDIR/0000.vcf \
+            | awk '{{print $1"\t"$2"\t"$4"\t"$5"\t1\t0\t1"}}' \
+            >> {output.table} || true
+
+        grep -v '^#' $TMPDIR/0002.vcf \
+            | awk '{{print $1"\t"$2"\t"$4"\t"$5"\t1\t1\t2"}}' \
+            >> {output.table} || true
+
+        grep -v '^#' $TMPDIR/0001.vcf \
+            | awk '{{print $1"\t"$2"\t"$4"\t"$5"\t0\t1\t1"}}' \
+            >> {output.table} || true
+
+        rm -rf $TMPDIR
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] caller_concordance complete" >> {log.out}
+        """
+
+
+# =============================================================================
+# LAYER 3 — CLINICAL INTERPRETATION & REPORTING
+# VEP annotation, ACMG/AMP classification, variant shortlisting, and HTML report.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rule: vep_annotate
+#
+# Annotates the panel-filtered Clair3 VCF using Ensembl VEP offline.
+# Output is tab-separated, one row per transcript per variant.
+# Transcript selection and consequence prioritisation happen downstream in snv_process.
+# -----------------------------------------------------------------------------
+rule vep_annotate:
+    input:
+        vcf = CLAIR3_VCF_PANEL,
+        ref = config["ref_fasta"]
+    output:
+        tsv   = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "vep",
+            "{sample}.clair3.vep.tsv"
+        ),
+        stats = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "vep",
+            "{sample}.clair3.vep_stats.html"
+        )
+    params:
+        vep      = VEP,
+        cache    = config["vep"]["cache"],
+        plugins  = config["vep"]["plugins"],
+        assembly = config["vep"]["assembly"],
+        flags    = config["vep"]["extra_flags"]
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "vep.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "vep.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+
+        mkdir -p $(dirname {output.tsv})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] vep_annotate started" > {log.out}
+        echo "  input  : {input.vcf}"    >> {log.out}
+        echo "  cache  : {params.cache}" >> {log.out}
+
+        {params.vep} \
+            --input_file {input.vcf} \
+            --output_file {output.tsv} \
+            --stats_file {output.stats} \
+            --fasta {input.ref} \
+            --cache \
+            --dir_cache {params.cache} \
+            --dir_plugins {params.plugins} \
+            --assembly {params.assembly} \
+            {params.flags} \
+            > {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] vep_annotate complete" >> {log.out}
+        """
+
+
+
+# =============================================================================
+# Rule: vep_annotate_sniffles
+# Runs VEP on Sniffles panel VCF to annotate 10-49bp indels for the
+# indel table (two-caller concordance: Clair3 + Sniffles).
+# =============================================================================
+rule vep_annotate_sniffles:
+    input:
+        vcf = SNIFFLES_VCF_PANEL,
+        ref = config["ref_fasta"]
+    output:
+        tsv   = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "vep",
+            "{sample}.sniffles.vep.tsv"
+        ),
+        stats = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "vep",
+            "{sample}.sniffles.vep_stats.html"
+        )
+    params:
+        vep      = VEP,
+        cache    = config["vep"]["cache"],
+        plugins  = config["vep"]["plugins"],
+        assembly = config["vep"]["assembly"],
+        flags    = config["vep"]["extra_flags"]
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "vep_sniffles.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "vep_sniffles.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.tsv})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] vep_annotate_sniffles started" > {log.out}
+        {params.vep} \
+            --input_file {input.vcf} \
+            --output_file {output.tsv} \
+            --stats_file {output.stats} \
+            --fasta {input.ref} \
+            --cache \
+            --dir_cache {params.cache} \
+            --dir_plugins {params.plugins} \
+            --assembly {params.assembly} \
+            {params.flags} \
+            > {log.out} 2>> {log.err}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] vep_annotate_sniffles complete" >> {log.out}
+        """
+
+
+# =============================================================================
+# Rule: deepvariant_call
+#
+# Runs DeepVariant (ONT_R104 model) via Docker on the recovered BAM.
+# Restricted to the panel BED — reduces runtime significantly.
+# Docker must be available on the execution host (this pipeline runs on minion,
+# not a compute cluster, so plain docker is used — no Singularity wrapper).
+#
+# Output VCF is bgzipped + tabixed in a post-processing step because
+# DeepVariant's --output_vcf writes a plain .vcf.gz that is already bgzipped
+# but NOT tabixed; the tbi is created here to allow downstream bcftools view.
+#
+# Mount strategy: bind-mount the run directory and the reference directory
+# separately so all absolute paths resolve correctly inside the container.
+# =============================================================================
+rule deepvariant_call:
+    input:
+        bam = BAM_FOR_CALLING,
+        bai = BAM_FOR_CALLING_BAI,
+        ref = config["ref_fasta"],
+        bed = config["deepvariant_bed"]
+    output:
+        vcf = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "small_variants", "deepvariant", "{sample}.deepvariant.vcf.gz"
+        ),
+        tbi = os.path.join(
+            config["samples_root"], "{sample}",
+            "variants", "small_variants", "deepvariant", "{sample}.deepvariant.vcf.gz.tbi"
+        )
+    params:
+        outdir     = os.path.join(
+            config["samples_root"], "{sample}", "variants", "small_variants", "deepvariant"
+        ),
+        dv_version = "1.10.0",
+        sif        = config["deepvariant_sif"],
+        samtools   = SAMTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs", "deepvariant.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs", "deepvariant.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p {params.outdir}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] deepvariant_call started" > {log.out}
+        echo "  sample  : {wildcards.sample}" >> {log.out}
+        echo "  BAM     : {input.bam}"        >> {log.out}
+        echo "  BED     : {input.bed}"        >> {log.out}
+        echo "  model   : ONT_R104 (DeepVariant {params.dv_version})" >> {log.out}
+        echo "  runner  : Apptainer {params.sif}" >> {log.out}
+
+        mkdir -p {params.outdir}/tmp
+        mkdir -p {params.outdir}/dv_logs
+
+        ABS_BAM=$(realpath {input.bam})
+        ABS_OUT=$(realpath {params.outdir})
+        ABS_REF=$(realpath {input.ref})
+        ABS_BED=$(realpath {input.bed})
+
+        DV_REGIONS=$(awk '{{printf "%s:%s-%s ",$1,$2,$3}}' $ABS_BED)
+        echo "  regions : $DV_REGIONS" >> {log.out}
+
+        export APPTAINER_TMPDIR=$ABS_OUT/apptainer_tmp
+        export APPTAINER_CACHEDIR=$ABS_OUT/apptainer_tmp
+        mkdir -p $ABS_OUT/apptainer_tmp
+
+        apptainer exec \
+            --nv \
+            --no-home \
+            --cleanenv \
+            --home /tmp \
+            --bind $(dirname $ABS_REF) \
+            --bind $(dirname $ABS_BED) \
+            --bind $(dirname $ABS_BAM) \
+            --bind $ABS_OUT \
+            {params.sif} \
+            run_deepvariant \
+                --model_type=ONT_R104 \
+                --ref=$ABS_REF \
+                --reads=$ABS_BAM \
+                --regions="$DV_REGIONS" \
+                --output_vcf=$ABS_OUT/{wildcards.sample}.deepvariant.vcf.gz \
+                --num_shards={threads} \
+                --intermediate_results_dir=$ABS_OUT/tmp \
+                --logging_dir=$ABS_OUT/dv_logs \
+                --disable_small_model \
+
+            >> {log.out} 2>> {log.err}
+
+        # Ensure tabix index exists
+        # DV 1.10.0 creates index automatically — just verify files exist
+        ls $ABS_OUT/{wildcards.sample}.deepvariant.vcf.gz $ABS_OUT/{wildcards.sample}.deepvariant.vcf.gz.tbi >> {log.out}
+
+        VARIANT_COUNT=$(zcat {output.vcf} | grep -vc '^#' || echo "unknown")
+        echo "  raw variants called : $VARIANT_COUNT" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] deepvariant_call complete" >> {log.out}
+        """
+
+
+# =============================================================================
+# Rule: panel_filter_deepvariant
+#
+# Restricts DeepVariant VCF to panel BED regions and keeps only PASS variants.
+# Mirrors panel_filter_clair3 — output goes to annotation/vcf_inputs/.
+# Always uses full panel_bed (not ACTIVE_BED) so test-mode runs are correctly
+# filtered to the real panel region.
+# =============================================================================
+rule panel_filter_deepvariant:
+    input:
+        vcf = DV_VCF_GZ,
+        bed = config["panel_bed"]
+    output:
+        vcf = os.path.join(
+            config["samples_root"], "{sample}",
+            "annotation", "vcf_inputs", "{sample}.deepvariant.panel.vcf.gz"
+        ),
+        tbi = os.path.join(
+            config["samples_root"], "{sample}",
+            "annotation", "vcf_inputs", "{sample}.deepvariant.panel.vcf.gz.tbi"
+        )
+    params:
+        bcftools = BCFTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "panel_filter_deepvariant.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "panel_filter_deepvariant.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.vcf})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] panel_filter_deepvariant started" > {log.out}
+
+        {params.bcftools} view \
+            -R {input.bed} \
+            -f PASS \
+            -O z \
+            -o {output.vcf} \
+            {input.vcf} \
+            2>> {log.err}
+
+        {params.bcftools} index --tbi {output.vcf} 2>> {log.err}
+
+        VARIANT_COUNT=$(zcat {output.vcf} | grep -vc '^#' || echo "unknown")
+        echo "  PASS panel variants : $VARIANT_COUNT" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] panel_filter_deepvariant complete" >> {log.out}
+        """
+
+
+# =============================================================================
+# Rule: vep_annotate_deepvariant
+#
+# Annotates the panel-filtered DeepVariant VCF using Ensembl VEP offline.
+# Same flags as vep_annotate (Clair3) — consistent annotation for concordance.
+# Output VEP TSV is consumed by indel_process (--deepvariant_vep).
+# =============================================================================
+rule vep_annotate_deepvariant:
+    input:
+        vcf = DV_VCF_PANEL,
+        ref = config["ref_fasta"]
+    output:
+        tsv   = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "vep",
+            "{sample}.deepvariant.vep.tsv"
+        ),
+        stats = os.path.join(
+            config["samples_root"], "{sample}", "annotation", "vep",
+            "{sample}.deepvariant.vep_stats.html"
+        )
+    params:
+        vep      = VEP,
+        cache    = config["vep"]["cache"],
+        plugins  = config["vep"]["plugins"],
+        assembly = config["vep"]["assembly"],
+        flags    = config["vep"]["extra_flags"]
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "vep_deepvariant.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "vep_deepvariant.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.tsv})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] vep_annotate_deepvariant started" > {log.out}
+        echo "  input  : {input.vcf}"    >> {log.out}
+        echo "  cache  : {params.cache}" >> {log.out}
+
+        {params.vep} \
+            --input_file {input.vcf} \
+            --output_file {output.tsv} \
+            --stats_file {output.stats} \
+            --fasta {input.ref} \
+            --cache \
+            --dir_cache {params.cache} \
+            --dir_plugins {params.plugins} \
+            --assembly {params.assembly} \
+            {params.flags} \
+            > {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] vep_annotate_deepvariant complete" >> {log.out}
+        """
+
+
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rule: coverage_build_tables
+#
+# Steps 1 + 2 of the coverage module:
+#   1. Parse mosdepth regions BED → coverage_by_gene.tsv (adds target_size_bp)
+#   2. Expand semicolon-joined gene labels, join against panel gene reference,
+#      fill missing genes with depth=0 → coverage_complete.final.tsv
+#
+# Validates: gene count matches panel BED in the final TSV.
+# -----------------------------------------------------------------------------
+rule coverage_build_tables:
+    input:
+        regions_bed = MOSDEPTH_REPORT_BED_GZ,
+        gene_ref    = config["gene_intervals_ref"]
+    output:
+        by_gene = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.coverage_by_gene.tsv"
+        ),
+        final   = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.coverage.final.tsv"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "coverage_build_tables.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "coverage_build_tables.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.by_gene})
+        mkdir -p $(dirname {log.out})
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] coverage_build_tables started" > {log.out}
+        echo "  sample     : {wildcards.sample}"    >> {log.out}
+        echo "  regions_bed: {input.regions_bed}"   >> {log.out}
+        echo "  gene_ref   : {input.gene_ref}"      >> {log.out}
+
+        python3 {SCRIPTS}/coverage_build_tables.py \
+            --regions_bed {input.regions_bed} \
+            --gene_ref    {input.gene_ref} \
+            --out_by_gene {output.by_gene} \
+            --out_final   {output.final} \
+            --sample      {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] coverage_build_tables complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: coverage_summarise
+#
+# Steps 3 + 4 of the coverage module:
+#   3. Compute summary metrics (mean depth, median, genes below 10x / 20x)
+#      → coverage_summary.tsv
+#   4. Write low-coverage gene tables
+#      → genes_below_10x.tsv, genes_below_20x.tsv
+#
+# All outputs are derived from the master table only (no re-reading BED).
+# -----------------------------------------------------------------------------
+rule coverage_summarise:
+    input:
+        final = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.coverage.final.tsv"
+        )
+    output:
+        summary  = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.coverage_summary.tsv"
+        ),
+        below10  = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.genes_below_10x.tsv"
+        ),
+        below20  = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.genes_below_20x.tsv"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "coverage_summarise.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "coverage_summarise.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] coverage_summarise started" > {log.out}
+
+        python3 {SCRIPTS}/coverage_summarise.py \
+            --final_tsv   {input.final} \
+            --out_summary {output.summary} \
+            --out_below10 {output.below10} \
+            --out_below20 {output.below20} \
+            --sample      {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] coverage_summarise complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: coverage_plot
+#
+# Step 5 of the coverage module:
+#   Horizontal bar plot of per-gene mean depth, colour-coded by tier.
+#   Genes below 10x are labelled directly on the plot.
+#   Validated design: ggplot2, red/amber/green tiers, dashed thresholds.
+#
+# Requires R with: ggplot2, readr, dplyr
+# -----------------------------------------------------------------------------
+# coverage_plot removed — use coverage_plot_vertical rule (see below)
+
+
+# =============================================================================
+# REPORT MODULE — QC + RUN SUMMARY + HTML
+#
+# Rule execution order:
+#   nanoplot_qc
+#     → parse_nanostats_qc       (NanoStats.txt → qc_quality_thresholds.tsv)
+#     → plot_qc_quality_thresholds (TSV → PNG)
+#
+#   [sequencing_summary_file in config]
+#   + nanoplot_qc
+#     → build_run_summary        (seq_summary + NanoStats → run_summary TSVs)
+#
+#   mosdepth_coverage
+#     → generate_shared_target_flags (regions BED → shared_target_flags.tsv)
+#     → coverage_plot_vertical       (coverage TSV + flags → vertical PNG)
+#
+#   all of the above
+#     → generate_report_html     (HTML report, self-contained with embedded plots)
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# Rule: parse_nanostats_qc
+#
+# Extracts Q10–Q30 percentage values from NanoStats.txt.
+# NanoStats.txt is the ONLY authoritative source for quality thresholds.
+# Do NOT derive these from BAM or any other source.
+# -----------------------------------------------------------------------------
+rule parse_nanostats_qc:
+    input:
+        nanostats = os.path.join(
+            config["samples_root"], "{sample}", "qc", "nanoplot", "{sample}_NanoStats.txt"
+        )
+    output:
+        tsv = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.qc_thresholds.tsv"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "parse_nanostats_qc.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "parse_nanostats_qc.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.tsv}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] parse_nanostats_qc started" > {log.out}
+
+        python3 {SCRIPTS}/parse_nanostats.py \
+            --nanostats {input.nanostats} \
+            --out_tsv   {output.tsv} \
+            --sample    {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] parse_nanostats_qc complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: plot_qc_quality_thresholds
+#
+# Bar plot of Q10–Q30 quality thresholds. Locked colour scheme and axis limits.
+# Requires R with: ggplot2, readr
+# -----------------------------------------------------------------------------
+rule plot_qc_quality_thresholds:
+    input:
+        tsv = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.qc_thresholds.tsv"
+        )
+    output:
+        png = os.path.join(
+            config["samples_root"], "{sample}", "report", "plots",
+            "{sample}.qc_thresholds.png"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "plot_qc_quality_thresholds.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "plot_qc_quality_thresholds.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.png})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] plot_qc_quality_thresholds started" > {log.out}
+
+        python3 {SCRIPTS}/plot_qc_thresholds.py \
+            --input  {input.tsv} \
+            --output {output.png} \
+            >> {log.out} 2>> {log.err}
+
+        if [ ! -s "{output.png}" ]; then
+            echo "[ERROR] output PNG missing or empty" >&2; exit 1
+        fi
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] plot_qc_quality_thresholds complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: build_run_summary
+#
+# Combines per-barcode metrics from the run sequencing_summary file with
+# NanoPlot read-quality metrics into machine-readable and display TSVs.
+#
+# Sources (authoritative, do NOT mix):
+#   sequencing_summary_*.txt → Number_of_reads, Total_yield_Gb, Run_duration_hours
+#   NanoStats.txt            → Mean_read_length_bp, Read_N50_bp, Mean_read_quality
+# -----------------------------------------------------------------------------
+rule build_run_summary:
+    input:
+        nanostats   = os.path.join(
+            config["samples_root"], "{sample}", "qc", "nanoplot", "{sample}_NanoStats.txt"
+        )
+    params:
+        seq_summary = config["sequencing_summary_file"]
+    output:
+        summary = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.run_summary.tsv"
+        ),
+        display = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.run_summary_display.tsv"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "build_run_summary.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "build_run_summary.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.summary}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] build_run_summary started" > {log.out}
+
+        python3 {SCRIPTS}/build_run_summary.py \
+            --seq_summary  {params.seq_summary} \
+            --nanostats    {input.nanostats} \
+            --out_summary  {output.summary} \
+            --out_display  {output.display} \
+            --sample       {wildcards.sample} \
+            --barcode_col  25 \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] build_run_summary complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: generate_shared_target_flags
+#
+# Detects semicolon-joined gene labels in the mosdepth BED (e.g. COL4A3;COL4A4)
+# and writes a flags TSV used by the coverage plot and HTML report.
+# Rule: do NOT divide depth by 2; annotate with * only.
+# -----------------------------------------------------------------------------
+rule generate_shared_target_flags:
+    input:
+        regions_bed = MOSDEPTH_BED_GZ
+    output:
+        flags = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.shared_targets.tsv"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "shared_target_flags.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "shared_target_flags.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.flags}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] generate_shared_target_flags started" > {log.out}
+
+        python3 {SCRIPTS}/generate_shared_target_flags.py \
+            --regions_bed {input.regions_bed} \
+            --out_flags   {output.flags} \
+            --sample      {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] generate_shared_target_flags complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: coverage_plot_vertical
+#
+# Vertical bar plot of per-gene mean depth (validated accepted design).
+# Replaces the earlier horizontal version.
+# Genes sharing a merged target interval are annotated with *.
+# Depth labels shown for genes below 10x.
+# Softened palette: #D97B66 / #E7BE73 / #7FB6A4
+# Requires R with: ggplot2, readr, dplyr
+# -----------------------------------------------------------------------------
+rule coverage_plot_vertical:
+    input:
+        final = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.coverage.final.tsv"
+        ),
+        flags = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.shared_targets.tsv"
+        )
+    output:
+        png = os.path.join(
+            config["samples_root"], "{sample}", "report", "plots",
+            "{sample}.coverage.png"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "coverage_plot_vertical.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "coverage_plot_vertical.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.png})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] coverage_plot_vertical started" > {log.out}
+
+        python3 {SCRIPTS}/plot_coverage.py \
+            --input  {input.final} \
+            --flags  {input.flags} \
+            --output {output.png} \
+            --sample {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+
+        if [ ! -s "{output.png}" ]; then
+            echo "[ERROR] output PNG missing or empty" >&2; exit 1
+        fi
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] coverage_plot_vertical complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: generate_report_html
+#
+# Generates the SignalScope per-sample HTML report.
+# The report is fully self-contained — plots are embedded as base64 data URIs.
+#
+# Layout:
+#   Header: SignalScope™ + metadata bar (sample / run ID / date / version)
+#   Top row: [Sequencing Summary table] [QC quality plot]
+#   Full width: Coverage vertical bar plot
+#   Footer: coverage note + shared-target note
+# -----------------------------------------------------------------------------
+rule generate_igv_screenshots:
+    # barcode_recovered_bam_in_igv_rule_marker — uses the *recovered* BAM
+    # (sensitive-remap output) rather than the primary BAM; the gold-standard
+    # IGV screenshots were produced from the recovered BAM.
+    input:
+        bam             = BAM_FOR_CALLING,
+        bai             = BAM_FOR_CALLING_BAI,
+        snv_shortlist   = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.shortlist.with_gene_context.header.tsv"
+        )),
+        indel_shortlist = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "indel",
+            "{sample}.indel.shortlist.with_gene_context.header.tsv"
+        )),
+        sv_shortlist    = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "sv",
+            "{sample}.sv.shortlist.with_gene_context.header.tsv"
+        ))
+    output:
+        manifest = os.path.join(
+            config["samples_root"], "{sample}", "report", "igv",
+            "{sample}.igv_manifest.tsv"
+        )
+    params:
+        ref_fasta = config["ref_fasta"],
+        igv_genome = config.get("igv", {}).get("genome", "hg38"),
+        igv_sh    = config["tools"]["igv"],
+        flank     = config.get("igv", {}).get("flank", 200),
+        igv_mem   = config.get("igv", {}).get("memory", "4g")
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "generate_igv_screenshots.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "generate_igv_screenshots.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.manifest}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] generate_igv_screenshots started" > {log.out}
+
+        python3 {SCRIPTS}/generate_igv_screenshots.py \
+            --snv_shortlist   {input.snv_shortlist} \
+            --indel_shortlist {input.indel_shortlist} \
+            --sv_shortlist    {input.sv_shortlist} \
+            --bam             {input.bam} \
+            --ref_fasta       {params.ref_fasta} \
+            --igv_genome      {params.igv_genome} \
+            --out_dir         $(dirname {output.manifest}) \
+            --sample          {wildcards.sample} \
+            --igv_sh          {params.igv_sh} \
+            --flank           {params.flank} \
+            --igv_memory      {params.igv_mem} \
+            --preflight       clean \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] generate_igv_screenshots complete" >> {log.out}
+        """
+
+
+rule generate_report_html:
+    input:
+        run_display  = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.run_summary_display.tsv"
+        ),
+        qc_plot      = os.path.join(
+            config["samples_root"], "{sample}", "report", "plots",
+            "{sample}.qc_thresholds.png"
+        ),
+        cov_plot     = os.path.join(
+            config["samples_root"], "{sample}", "report", "plots",
+            "{sample}.coverage.png"
+        ),
+        shared_flags = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.shared_targets.tsv"
+        ),
+        snv_summary  = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.summary.tsv"
+        )),
+        snv_clinvar  = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.clinvar_summary.normalized.tsv"
+        )),
+        snv_shortlist = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.shortlist.with_gene_context.header.tsv"
+        )),
+        indel_summary  = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "indel",
+            "{sample}.indel.summary.tsv"
+        )),
+        indel_shortlist = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "indel",
+            "{sample}.indel.shortlist.with_gene_context.header.tsv"
+        )),
+        sv_summary     = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "sv",
+            "{sample}.sv.summary.tsv"
+        )),
+        sv_shortlist   = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "sv",
+            "{sample}.sv.shortlist.with_gene_context.header.tsv"
+        )),
+        recovery_plot  = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "plots",
+            "{sample}.pseudogene_recovery.png"
+        )) if config.get("pkd1_recovery", True) else [],
+        recovery_tsv   = ancient(os.path.join(
+            config["samples_root"], "{sample}", "recovery",
+            "{sample}.recovery_summary.tsv"
+        )) if config.get("pkd1_recovery", True) else [],
+        mosdepth_summary = ancient(os.path.join(
+            config["samples_root"], "{sample}", "coverage",
+            "{sample}.mosdepth.summary.txt"
+        )),
+        seq_perf_tsv     = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.sequencing_performance.tsv"
+        )),
+        tool_versions_tsv = ancient(os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.tool_versions.tsv"
+        )),
+        igv_manifest = os.path.join(
+            config["samples_root"], "{sample}", "report", "igv",
+            "{sample}.igv_manifest.tsv"
+        )
+    output:
+        html = os.path.join(
+            config["samples_root"], "{sample}", "report", "html",
+            "{sample}.report.html"
+        )
+    params:
+        recovery_plot_flag = lambda wc, input: (f"--recovery_plot {input.recovery_plot}" if os.path.exists(str(input.recovery_plot)) else ""),
+        recovery_tsv_flag  = lambda wc, input: (f"--recovery_tsv {input.recovery_tsv}" if os.path.exists(str(input.recovery_tsv)) else ""),
+        run_id         = config["run_id"],
+        report_date    = config.get("report_date", __import__("datetime").date.today().strftime("%d %B %Y")),
+        report_version = config["report"]["version"],
+        platform       = config["report"]["platform"],
+        library        = config["report"]["library"],
+        targeting      = config["report"]["targeting"],
+        report_bed     = config["report_bed"],
+        basecalling    = config["report"]["basecalling"],
+        alignment      = config["report"]["alignment"],
+        variants       = config["report"]["variants"],
+        logo_path      = lambda wildcards: os.path.join(
+            config["samples_root"], wildcards.sample, "report", "logo",
+            config.get("report", {}).get("logo_filename", "SignalScope_logo.png")
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "generate_report_html.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "generate_report_html.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.html}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] generate_report_html started" > {log.out}
+
+        python3 {SCRIPTS}/generate_report_html.py \
+            --sample         {wildcards.sample} \
+            --run_id         "{params.run_id}" \
+            --report_date    "{params.report_date}" \
+            --run_display    {input.run_display} \
+            --qc_plot        {input.qc_plot} \
+            --cov_plot       {input.cov_plot} \
+            --shared_flags   {input.shared_flags} \
+            --report_version "{params.report_version}" \
+            --platform       "{params.platform}" \
+            --library        "{params.library}" \
+            --targeting      "{params.targeting}" \
+            --panel_bed      "{params.report_bed}" \
+            --basecalling    "{params.basecalling}" \
+            --alignment      "{params.alignment}" \
+            --variants       "{params.variants}" \
+            --snv_summary    {input.snv_summary} \
+            --snv_clinvar    {input.snv_clinvar} \
+            --snv_shortlist      {input.snv_shortlist} \
+            --indel_summary      {input.indel_summary} \
+            --indel_shortlist    {input.indel_shortlist} \
+            --sv_summary         {input.sv_summary} \
+            --sv_shortlist       {input.sv_shortlist} \
+            {params.recovery_plot_flag} \
+            {params.recovery_tsv_flag} \
+            --mosdepth_summary   {input.mosdepth_summary} \
+            --seq_perf_tsv       {input.seq_perf_tsv} \
+            --tool_versions_tsv  {input.tool_versions_tsv} \
+            --logo_path          "{params.logo_path}" \
+            --igv_dir            $(dirname {input.snv_shortlist})/../igv \
+            --out_html           {output.html} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] generate_report_html complete" >> {log.out}
+        """
+
+
+# =============================================================================
+# SNV REPORT MODULE
+#
+# Implements the validated barcode06 SNV workflow per sample.
+#
+# Rule: snv_process
+#            gene context reference
+#   Outputs: snv.summary.tsv, snv.clinvar_summary.normalized.tsv,
+#            snv.shortlist.with_gene_context.header.tsv
+#            (plus intermediate snv.merged.tsv and snv.annotated.tsv)
+#
+# The generate_report_html rule already accepts these as optional inputs
+# and renders the SNV section when they are present.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rule: snv_process
+#
+# Steps performed (see scripts/snv_process.py for full detail):
+#   1.  Extract SNPs from Clair3 VCF
+#   4.  Join VEP annotation (best transcript: MANE_SELECT > CANONICAL > first)
+#   5.  Normalise ClinVar categories
+#   6.  Apply shortlist filter: IMPACT HIGH/MODERATE + MAX_AF < threshold
+#   7.  Join gene context (disease_summary, renal_relevance, inheritance,
+#       phenotype_group) from shared gene context reference
+#   8.  Write all output TSVs
+# -----------------------------------------------------------------------------
+rule snv_process:
+    input:
+        clair3_vcf       = CLAIR3_VCF_RAW,
+        deepvariant_vcf  = DV_VCF_PANEL,
+        panel_bed        = config["panel_bed"],
+        vep_tsv          = VEP_TSV,
+        dv_vep_tsv       = DV_VEP_TSV,
+        gene_context_ref = config["gene_context_ref"],
+        gene_features    = config["gene_features_ref"]
+    output:
+        summary    = os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.summary.tsv"
+        ),
+        clinvar    = os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.clinvar_summary.normalized.tsv"
+        ),
+        shortlist  = os.path.join(
+            config["samples_root"], "{sample}", "report", "snv",
+            "{sample}.snv.shortlist.with_gene_context.header.tsv"
+        )
+    params:
+        out_dir = os.path.join(config["samples_root"], "{sample}", "report", "snv"),
+        max_af  = config["clinical_filtering"]["max_population_af"]
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "snv_process.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "snv_process.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p {params.out_dir} $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] snv_process started" > {log.out}
+        echo "  sample         : {wildcards.sample}"          >> {log.out}
+        echo "  clair3_vcf     : {input.clair3_vcf}"          >> {log.out}
+        echo "  deepvariant_vcf: {input.deepvariant_vcf}"     >> {log.out}
+        echo "  vep_tsv        : {input.vep_tsv}"             >> {log.out}
+        echo "  max_af         : {params.max_af}"             >> {log.out}
+
+        python3 {SCRIPTS}/snv_process.py \
+            --clair3_vcf       {input.clair3_vcf} \
+            --deepvariant_vcf  {input.deepvariant_vcf} \
+            --panel_bed        {input.panel_bed} \
+            --vep_tsv          {input.vep_tsv} \
+            --deepvariant_vep  {input.dv_vep_tsv} \
+            --gene_context_ref {input.gene_context_ref} \
+            --gene_features    {input.gene_features} \
+            --out_dir          {params.out_dir} \
+            --sample           {wildcards.sample} \
+            --max_af           {params.max_af} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] snv_process complete" >> {log.out}
+        """
+
+
+# =============================================================================
+# SEQUENCING PERFORMANCE + TOOL VERSIONS MODULE
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rule: create_targeted_bam
+#
+# Filters the primary BAM to reads overlapping the panel BED.
+# This isolates adaptive-sampling-accepted reads from rejected short reads,
+# giving a clean view of actual sequencing performance on the target.
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+# Rule: indel_process
+# =============================================================================
+rule indel_process:
+    input:
+        clair3_vcf    = os.path.join(VCF_IN_DIR, f"{SAMPLE}.clair3.panel.vcf.gz"),
+        vep_tsv       = os.path.join(VEP_DIR, f"{SAMPLE}.clair3.vep.tsv"),
+        dv_vcf        = DV_VCF_PANEL,
+        dv_vep_tsv    = DV_VEP_TSV,
+        gene_context  = config["gene_context_ref"],
+        gene_features = config["gene_features_ref"],
+        panel_bed     = ACTIVE_BED
+    output:
+        summary   = os.path.join(
+            config["samples_root"], "{sample}", "report", "indel",
+            "{sample}.indel.summary.tsv"),
+        shortlist = os.path.join(
+            config["samples_root"], "{sample}", "report", "indel",
+            "{sample}.indel.shortlist.with_gene_context.header.tsv")
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "indel_process.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "indel_process.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.summary}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] indel_process started" > {log.out}
+        python3 {SCRIPTS}/indel_process.py \
+            --clair3_vcf       {input.clair3_vcf} \
+            --vep_tsv          {input.vep_tsv} \
+            --deepvariant_vcf  {input.dv_vcf} \
+            --deepvariant_vep  {input.dv_vep_tsv} \
+            --gene_context     {input.gene_context} \
+            --gene_features    {input.gene_features} \
+            --panel_bed        {input.panel_bed} \
+            --out_dir          $(dirname {output.summary}) \
+            --sample           {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] indel_process complete" >> {log.out}
+        """
+
+# =============================================================================
+# Rule: sv_process
+# =============================================================================
+rule sv_process:
+    input:
+        sniffles_vcf  = os.path.join(SNIFFLES_DIR, f"{SAMPLE}.sniffles.panel.vcf.gz"),
+        cutesv_vcf    = os.path.join(CUTESV_DIR,   f"{SAMPLE}.cutesv.panel.vcf.gz"),
+        gene_features = config["gene_features_ref"],
+        gene_context  = config["gene_context_ref"],
+        exon_bounds   = config["exon_boundaries_ref"]
+    output:
+        summary   = os.path.join(
+            config["samples_root"], "{sample}", "report", "sv",
+            "{sample}.sv.summary.tsv"),
+        shortlist = os.path.join(
+            config["samples_root"], "{sample}", "report", "sv",
+            "{sample}.sv.shortlist.with_gene_context.header.tsv")
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "sv_process.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "sv_process.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.summary}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] sv_process started" > {log.out}
+        python3 {SCRIPTS}/sv_process.py \
+            --sniffles_vcf    {input.sniffles_vcf} \
+            --cutesv_vcf      {input.cutesv_vcf} \
+            --gene_features   {input.gene_features} \
+            --gene_context    {input.gene_context} \
+            --exon_boundaries {input.exon_bounds} \
+            --out_dir         $(dirname {output.summary}) \
+            --sample          {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] sv_process complete" >> {log.out}
+        """
+
+# =============================================================================
+# Rule: plot_pseudogene_recovery
+# Plots PKD1 secondary alignment recovery results.
+# MUC1 recovery was tested and found ineffective (VNTR read length constraint,
+# not a pseudogene alignment problem). MUC1 depth is still measured and shown
+# in the summary TSV for reference, but no recovery is attempted.
+# =============================================================================
+if config.get("pkd1_recovery", True):
+    rule plot_pseudogene_recovery:
+        input:
+            recovery_tsv = RECOVERY_TSV
+        output:
+            png = os.path.join(
+                config["samples_root"], "{sample}", "report", "plots",
+                "{sample}.pseudogene_recovery.png"
+            )
+        log:
+            out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                               "plot_pseudogene_recovery.stdout.log"),
+            err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                               "plot_pseudogene_recovery.stderr.log")
+        shell:
+            """
+            set -euo pipefail
+            mkdir -p $(dirname {output.png})
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] plot_pseudogene_recovery started" > {log.out}
+            python3 {SCRIPTS}/plot_pseudogene_recovery.py \
+                --input  {input.recovery_tsv} \
+                --output {output.png} \
+                --sample {wildcards.sample} \
+                >> {log.out} 2>> {log.err}
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] plot_pseudogene_recovery complete" >> {log.out}
+            """
+    
+    
+rule create_targeted_bam:
+    input:
+        bam = BAM_PRI,
+        bai = BAM_PRI_BAI,
+        bed = config["panel_bed"]
+    output:
+        bam = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted",
+            "{sample}.targeted.bam"
+        ),
+        bai = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted",
+            "{sample}.targeted.bam.bai"
+        )
+    params:
+        samtools = SAMTOOLS
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "create_targeted_bam.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "create_targeted_bam.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.bam})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] create_targeted_bam started" > {log.out}
+        echo "  BED : {input.bed}" >> {log.out}
+
+        {params.samtools} view -@ {threads} -b -L {input.bed} {input.bam} \
+            > {output.bam} 2>> {log.err}
+
+        {params.samtools} index -@ {threads} {output.bam} 2>> {log.err}
+
+        READ_COUNT=$({params.samtools} flagstat {output.bam} | awk 'NR==1{{print $1}}')
+        echo "  Targeted reads: $READ_COUNT" >> {log.out}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] create_targeted_bam complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: targeted_nanoplot
+#
+# Runs NanoPlot on the BED-filtered BAM to get targeted read statistics.
+# Uses --bam mode, consistent with the whole-sample QC run.
+# -----------------------------------------------------------------------------
+rule targeted_nanoplot:
+    input:
+        bam = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted",
+            "{sample}.targeted.bam"
+        ),
+        bai = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted",
+            "{sample}.targeted.bam.bai"
+        )
+    output:
+        nanostats = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted", "nanoplot",
+            "{sample}_NanoStats.txt"
+        )
+    params:
+        nanoplot = NANOPLOT,
+        outdir   = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted", "nanoplot"
+        ),
+        prefix   = "{sample}_"
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "targeted_nanoplot.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "logs",
+                           "targeted_nanoplot.stderr.log")
+    threads: config["threads"]
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p {params.outdir}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] targeted_nanoplot started" > {log.out}
+
+        {params.nanoplot} \
+            --bam    {input.bam} \
+            --outdir {params.outdir} \
+            --prefix {params.prefix} \
+            --threads {threads} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] targeted_nanoplot complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: build_sequencing_performance
+#
+# Combines whole-dataset metrics (from run_summary.tsv) with targeted-region
+# metrics (from targeted BAM + NanoStats) into a single comparison TSV.
+#
+# Output: {sample}.sequencing_performance.tsv
+# Columns: metric | whole_dataset | targeted_regions
+# -----------------------------------------------------------------------------
+rule build_sequencing_performance:
+    input:
+        run_summary      = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.run_summary.tsv"
+        ),
+        targeted_bam     = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted",
+            "{sample}.targeted.bam"
+        ),
+        targeted_nanostats = os.path.join(
+            config["samples_root"], "{sample}", "qc", "targeted", "nanoplot",
+            "{sample}_NanoStats.txt"
+        )
+    params:
+        seq_summary  = config.get("sequencing_summary_file", ""),
+    output:
+        tsv = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.sequencing_performance.tsv"
+        )
+    log:
+        out = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "build_sequencing_performance.stdout.log"),
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "build_sequencing_performance.stderr.log")
+    shell:
+        """
+        set -euo pipefail
+        mkdir -p $(dirname {output.tsv}) $(dirname {log.out})
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] build_sequencing_performance started" > {log.out}
+
+        python3 {SCRIPTS}/build_sequencing_performance.py \
+            --run_summary        {input.run_summary} \
+            --targeted_bam       {input.targeted_bam} \
+            --targeted_nanostats {input.targeted_nanostats} \
+            --seq_summary        {params.seq_summary} \
+            --out_tsv            {output.tsv} \
+            --sample             {wildcards.sample} \
+            >> {log.out} 2>> {log.err}
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] build_sequencing_performance complete" >> {log.out}
+        """
+
+
+# -----------------------------------------------------------------------------
+# Rule: record_tool_versions
+#
+# Captures version strings and model info for all key pipeline tools.
+# Output: {sample}.tool_versions.tsv
+# Columns: tool | version | model | path
+#
+# Errors in version capture are non-fatal (tool may emit to stderr).
+# -----------------------------------------------------------------------------
+rule record_tool_versions:
+    output:
+        tsv = os.path.join(
+            config["samples_root"], "{sample}", "report", "data",
+            "{sample}.tool_versions.tsv"
+        )
+    params:
+        dorado       = DORADO,
+        start_from   = START_FROM,
+        bam_path     = BAM_PRI,
+        minimap2     = MINIMAP2,
+        samtools     = SAMTOOLS,
+
+        sniffles     = SNIFFLES,
+        cutesv       = config["tools"]["cutesv"],
+        clair3_sif   = config["clair3"]["sif"],
+        vep_sif      = config["vep"]["sif"],
+        dv_vcf_glob  = os.path.join(config["samples_root"], "{sample}", "variants", "small_variants", "deepvariant", "{sample}.deepvariant.vcf.gz"),
+        dorado_model = config["dorado"]["model"],
+        clair3_model = CLAIR3_MODEL,
+        dv_sif_path  = config["deepvariant_sif"],
+    log:
+        err = os.path.join(config["samples_root"], "{sample}", "report", "logs",
+                           "record_tool_versions.stderr.log")
+    shell:
+        """
+        # Explicitly disable strict mode for this rule — version commands
+        # may exit non-zero and we want to capture "unavailable" gracefully.
+        set +euo pipefail
+        mkdir -p $(dirname {output.tsv}) $(dirname {log.err})
+
+        echo -e "tool\tversion\tmodel\tpath" > {output.tsv}
+
+        # Dorado + Minimap2: extract from BAM header when start_from=bam
+        if [ "{params.start_from}" = "bam" ] && [ -f "{params.bam_path}" ]; then
+            HDR=$(samtools view -H {params.bam_path} 2>/dev/null)
+            # Basecaller: look for a dorado @PG or basecall_model in @RG; else report as not recorded
+            BC_MODEL=$(echo "$HDR" | grep "^@RG" | grep -o "basecall_model=[^\t ]*" | head -1 | cut -d= -f2)
+            DORADO_PG=$(echo "$HDR" | grep "^@PG" | grep -i "dorado\|basecaller\|guppy" | head -1)
+            if [ -n "$DORADO_PG" ]; then
+                BC_PN=$(echo "$DORADO_PG" | grep -o "PN:[^\t ]*" | cut -d: -f2)
+                BC_VER=$(echo "$DORADO_PG" | grep -o "VN:[^\t ]*" | cut -d: -f2)
+                echo -e "basecaller\t$BC_PN $BC_VER\t${{BC_MODEL:-see config}}\tExtracted from BAM header" >> {output.tsv}
+            else
+                echo -e "basecaller\tnot recorded in BAM\t${{BC_MODEL:-{params.dorado_model}}}\tBAM has no basecaller provenance; model from config" >> {output.tsv}
+            fi
+            # Aligner: the minimap2 (or other) @PG line
+            AL_PG=$(echo "$HDR" | grep "^@PG" | grep -i "minimap2\|bwa\|winnowmap" | head -1)
+            if [ -n "$AL_PG" ]; then
+                AL_PN=$(echo "$AL_PG" | grep -o "PN:[^\t ]*" | cut -d: -f2)
+                AL_VER=$(echo "$AL_PG" | grep -o "VN:[^\t ]*" | cut -d: -f2)
+                echo -e "aligner\t$AL_PN $AL_VER\t-\tExtracted from BAM header" >> {output.tsv}
+            else
+                echo -e "aligner\tnot recorded in BAM\t-\tBAM has no aligner provenance" >> {output.tsv}
+            fi
+        else
+            DORADO_VER=$({{ {params.dorado} --version 2>&1 || echo "unavailable"; }} | head -1)
+            echo -e "dorado\t$DORADO_VER\t$(basename {params.dorado_model})\t{params.dorado}" >> {output.tsv}
+            MM2_VER=$({{ {params.minimap2} --version 2>&1 || echo "unavailable"; }} | head -1)
+            echo -e "minimap2\t$MM2_VER\t-\t{params.minimap2}" >> {output.tsv}
+        fi
+
+        # Samtools: emits version to stdout
+        SAM_VER=$({{ {params.samtools} --version 2>&1 || echo "unavailable"; }} | head -1)
+        echo -e "samtools\t$SAM_VER\t-\t{params.samtools}" >> {output.tsv}
+
+        # Clair3 v2: query version from the Apptainer container
+        CLAIR3_VER=$({{ apptainer exec {params.clair3_sif} /opt/bin/run_clair3.sh --version 2>&1 || echo "unavailable"; }} | head -1)
+        echo -e "clair3\t$CLAIR3_VER\t{params.clair3_model}\t{params.clair3_sif}" >> {output.tsv}
+
+        # Sniffles: emits version to stdout or stderr depending on build
+        SNIFFLES_VER=$({{ {params.sniffles} --version 2>&1 || echo "unavailable"; }} | head -1)
+        echo -e "sniffles\t$SNIFFLES_VER\t-\t{params.sniffles}" >> {output.tsv}
+
+        # CuteSV: emits version to stdout
+        CUTESV_VER=$({{ {params.cutesv} --version 2>&1 || echo "unavailable"; }} | head -1)
+        echo -e "cutesv\t$CUTESV_VER\t-\t{params.cutesv}" >> {output.tsv}
+
+        # DeepVariant: runs via Docker; extract version from output VCF header
+        DV_VCF={params.dv_vcf_glob}
+        if [ -f "$DV_VCF" ]; then
+            DV_VER=$(zcat "$DV_VCF" 2>/dev/null | grep "^##DeepVariant_version=" | head -1 | cut -d= -f2 || echo "unavailable")
+        else
+            DV_VER="unavailable"
+        fi
+        echo -e "deepvariant\t$DV_VER\tONT_R104 (--disable_small_model)\t{params.dv_sif_path}" >> {output.tsv}
+
+        # VEP: query version from the Apptainer container
+        VEP_VER=$({{ apptainer exec {params.vep_sif} vep 2>&1 | grep -i "ensembl-vep" | head -1 | grep -o "[0-9]*\.[0-9]*" || echo "unavailable"; }})
+        echo -e "vep\t$VEP_VER\tGRCh38 cache\t{params.vep_sif}" >> {output.tsv}
+        echo "  Written: {output.tsv}" 2>> {log.err}
+        """

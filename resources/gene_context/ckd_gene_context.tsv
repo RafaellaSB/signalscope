@@ -1,0 +1,34 @@
+gene	disease_summary	renal_relevance	inheritance	phenotype_group	omim_gene_id
+AGXT	primary hyperoxaluria type 1 / alanine glyoxylate aminotransferase deficiency	high	AR	tubulopathy	604285
+AHI1	Joubert syndrome 3	high	AR	ciliopathy	608894
+APRT	adenine phosphoribosyltransferase deficiency	high	AR	tubulopathy	102600
+ATP6V0A4	renal tubular acidosis, distal, 3, with or without sensorineural hearing loss	high	AR	tubulopathy	605239
+ATP6V1B1	renal tubular acidosis, distal, 2, with progressive sensorineural hearing loss / autosomal dominant distal renal tubular acidosis	high	AR	tubulopathy	192132
+AVPR2	diabetes insipidus, nephrogenic, X-linked	high	XL	tubulopathy	300538
+BBS10	BBS10-related ciliopathy / Bardet-Biedl syndrome 10	high	AR	ciliopathy	610148
+CASR	neonatal severe primary hyperparathyroidism / familial hypocalciuric hypercalcemia 1 / autosomal dominant hypocalcemia 1	high	AD	tubulopathy	601199
+CD46	atypical hemolytic-uremic syndrome with MCP/CD46 anomaly / atypical hemolytic-uremic syndrome	high	AD/AR	glomerular	120920
+CEP290	CEP290-related ciliopathy / Joubert syndrome 5	high	AR	ciliopathy	610142
+CFH	C3 glomerulonephritis / atypical hemolytic-uremic syndrome	high	AR	glomerular	134370
+CLCN5	Dent disease type 1	high	XL	tubulopathy	300008
+COL4A3	Alport syndrome / autosomal recessive Alport syndrome / Alport syndrome 3b, autosomal recessive	high	AD/AR	glomerular	120070
+COL4A4	autosomal recessive Alport syndrome / Alport syndrome	high	AR	glomerular	120131
+COL4A5	Alport syndrome / X-linked Alport syndrome	high	XL	glomerular	303630
+CTNS	nephropathic cystinosis / cystinosis	high	AR	tubulopathy	606272
+DNAJB11	autosomal dominant polycystic kidney disease	high	AD	cystic	611341
+HNF1B	renal cysts and diabetes syndrome	high	AD	cystic	189907
+LMX1B	nail-patella syndrome	high	AD	glomerular	602575
+MUC1	tubulointerstitial kidney disease, autosomal dominant, 2	high	AD	tubulopathy	158340
+NPHP1	nephronophthisis 1 / Joubert syndrome with renal defect	high	AR	ciliopathy	256100
+NPHP4	nephronophthisis 4 / Senior-Loken syndrome 4	high	AR	ciliopathy	606966
+NPHS1	congenital nephrotic syndrome, Finnish type	high	AR	glomerular	602716
+NPHS2	nephrotic syndrome, type 2	high	AR	glomerular	604766
+PKD1	autosomal recessive polycystic kidney disease / autosomal dominant polycystic kidney disease / polycystic kidney disease 1	high	AD	cystic	601313
+PKD2	autosomal dominant polycystic kidney disease	high	AD	cystic	173910
+PKHD1	autosomal recessive polycystic kidney disease / polycystic kidney disease 4	high	AR	cystic	606702
+SLC12A3	Gitelman syndrome	high	AR	tubulopathy	600968
+SLC4A1	renal tubular acidosis, distal, 4, with hemolytic anemia / southeast Asian ovalocytosis / hereditary spherocytosis type 4	high	AD	tubulopathy	109270
+TMEM67	Meckel syndrome, type 3 / ciliopathy / COACH syndrome 1	high	AR	ciliopathy	609884
+TRPC6	focal segmental glomerulosclerosis 2	high	AD	glomerular	603965
+UMOD	autosomal dominant medullary cystic kidney disease with or without hyperuricemia / glomerulocystic kidney disease with hyperuricemia and isosthenuria	high	AD	tubulopathy	191845
+WT1	Denys-Drash syndrome / Wilms tumor 1	high	AD	glomerular	607102
