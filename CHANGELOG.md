@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.10.0 (2026-11-24)
+## v1.10.0 (2026-11-25)
 
 ### Small variants
 - Two callers (Clair3 v2.0.1 and DeepVariant 1.10.0); the Clair3 model is chosen to match the

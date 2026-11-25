@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use SignalScope, please cite it as below."
 title: "SignalScope"
 version: 1.10.0
-date-released: 2026-11-24
+date-released: 2026-11-25
 license: MIT
 repository-code: "https://github.com/RafaellaSB/signalscope"
 authors:
@@ -12,6 +12,7 @@ authors:
     affiliation: "James Cook University"
   - family-names: Mallett
     given-names: Andrew J.
+    affiliation: "James Cook University; Townsville University Hospital; The University of Queensland"
   - family-names: Schmitz
     given-names: Ulf
     affiliation: "James Cook University"
