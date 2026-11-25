@@ -1,25 +1,27 @@
 # conda environment for the tools SignalScope runs on the host (the callers that need a GPU run in
-# Apptainer containers). Versions marked "tested" are those of the validation runs.
+# Apptainer containers). Pinned to the versions of the validation runs.
+#   conda env create -f envs/signalscope.yml
 name: signalscope
 channels:
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
-  - python>=3.8
-  - snakemake-minimal=5.10.0     # tested
-  - sniffles=2.7.5               # tested
-  - cutesv=2.1.3                 # tested
-  - minimap2
-  - samtools
-  - bcftools
-  - htslib                       # bgzip, tabix
-  - bedtools
-  - whatshap=1.7                # tested (phasing and haplotag)
-  - mosdepth
-  - nanoplot
+  - python=3.10                  # the one Python version that WhatsHap 1.7 and Sniffles2 2.7.5 share
+  - snakemake-minimal=5.10.0
+  - sniffles=2.7.5
+  - cutesv=2.1.3
+  - whatshap=1.7                 # phasing and haplotag
+  - minimap2=2.31
+  - samtools=1.23.1
+  - bcftools=1.24
+  - htslib=1.23.1                # bgzip, tabix
+  - bedtools=2.31.1
+  - mosdepth=0.3.14
+  - nanoplot=1.47.1
+  - pysam
   - pandas
   - numpy
   - matplotlib
-  - pysam
   - pillow
-  - lxml                         # report_redesign.py (final report)
+  - lxml                         # final report (report_redesign.py)
