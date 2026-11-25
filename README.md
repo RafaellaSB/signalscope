@@ -1,4 +1,17 @@
-# SignalScope v1.10.0
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/SignalScope_logo_dark.png">
+    <img src="assets/SignalScope_logo_light.png" alt="SignalScope" width="520">
+  </picture>
+</p>
+
+<h1 align="center">SignalScope</h1>
+<p align="center">Long-read gene panel analysis for Oxford Nanopore adaptive sampling</p>
+<p align="center">
+  <img alt="Release" src="https://img.shields.io/github/v/release/RafaellaSB/signalscope">
+  <img alt="Licence" src="https://img.shields.io/github/license/RafaellaSB/signalscope">
+  <img alt="Snakemake" src="https://img.shields.io/badge/snakemake-5.10-brightgreen">
+</p>
 
 SignalScope is a Snakemake workflow for Oxford Nanopore (ONT) adaptive-sampling data from
 disease gene panels. From aligned reads (or POD5/FASTQ) it calls single nucleotide variants
