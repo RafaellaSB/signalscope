@@ -6,12 +6,31 @@
 </p>
 
 <h1 align="center">SignalScope</h1>
-<p align="center">Long-read gene panel analysis for Oxford Nanopore adaptive sampling</p>
+<p align="center"><b>From nanopore signal to a prioritised variant report, for adaptive-sampling gene panels.</b></p>
+
 <p align="center">
-  <img alt="Release" src="https://img.shields.io/github/v/release/RafaellaSB/signalscope">
-  <img alt="Licence" src="https://img.shields.io/github/license/RafaellaSB/signalscope">
-  <img alt="Snakemake" src="https://img.shields.io/badge/snakemake-5.10-brightgreen">
+  <a href="https://github.com/RafaellaSB/signalscope/releases"><img alt="Release" src="https://img.shields.io/github/v/release/RafaellaSB/signalscope?color=EF9E1C&label=release"></a>
+  <a href="LICENSE"><img alt="Licence" src="https://img.shields.io/github/license/RafaellaSB/signalscope?color=1F2D3D"></a>
+  <img alt="Snakemake" src="https://img.shields.io/badge/snakemake-5.10-1F2D3D">
+  <img alt="Oxford Nanopore" src="https://img.shields.io/badge/Oxford%20Nanopore-R10.4.1-EF9E1C">
+  <img alt="Benchmark" src="https://img.shields.io/badge/benchmark-GIAB%20HG002%20v5.0q-1F2D3D">
+  <img alt="Research use" src="https://img.shields.io/badge/use-research-EF9E1C">
 </p>
+
+<p align="center">
+  <a href="#key-features">Key features</a> ·
+  <a href="#the-report">The report</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#citation">Citation</a>
+</p>
+
+<br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme_pipeline_dark.png">
+  <img src="assets/readme_pipeline_light.png" alt="SignalScope workflow: signal to reads, dual-caller detection, read-based phasing, prioritisation, report" width="100%">
+</picture>
 
 SignalScope is a Snakemake workflow for Oxford Nanopore (ONT) adaptive-sampling data from
 disease gene panels. From aligned reads (or POD5/FASTQ) it calls single nucleotide variants
@@ -19,6 +38,55 @@ disease gene panels. From aligned reads (or POD5/FASTQ) it calls single nucleoti
 variants (SVs, 50 bp or more) with two callers (Sniffles2 and cuteSV), annotates them, applies a
 decision tree based on a subset of the ACMG/AMP criteria, and writes a self-contained HTML report
 with IGV screenshots for review.
+
+## Key features
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="assets/readme_icon_callers.png" width="44" align="left" hspace="10" alt="">
+      <b>Two callers for every variant class</b><br>
+      Clair3 and DeepVariant for SNVs and indels, Sniffles2 and cuteSV for structural variants. Every call carries its caller concordance.
+    </td>
+    <td width="50%" valign="top">
+      <img src="assets/readme_icon_sv.png" width="44" align="left" hspace="10" alt="">
+      <b>Structural variants, prioritised</b><br>
+      Tiered by impact on the gene, read support, inheritance and population frequency from gnomAD-SV and the long-read catalogue CoLoRSdb.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="assets/readme_icon_phasing.png" width="44" align="left" hspace="10" alt="">
+      <b>Read-based phasing</b><br>
+      SNVs, indels and structural variants share one set of phase blocks, so a pair in a recessive gene is reported as in trans, in cis or phase unknown.
+    </td>
+    <td width="50%" valign="top">
+      <img src="assets/readme_icon_report.png" width="44" align="left" hspace="10" alt="">
+      <b>A report built for review</b><br>
+      One self-contained HTML file: tiered variants with their evidence, IGV screenshots, coverage of every gene, limitations, and the versions of all tools and databases.
+    </td>
+  </tr>
+</table>
+
+## The report
+
+<p align="center">
+  <img src="assets/readme_report_preview.png" alt="SignalScope report for HG002 (public reference sample): variant tiers and the decision-tree funnel" width="100%">
+</p>
+
+Report for the public reference sample HG002 (ONT Hereditary Cancer Panel data). Terms and column
+headings show a short definition on hover, or on tap on touch screens.
+
+## Quick start
+
+```bash
+git clone https://github.com/RafaellaSB/signalscope.git && cd signalscope
+conda env create -f envs/signalscope.yml && conda activate signalscope
+# 1. fill in config.yaml (tools, containers, reference, annotation resources): see Installation
+# 2. copy config/sample.template.yaml to config/<sample>.yaml and fill it in
+snakemake -n --configfile config/<sample>.yaml --config sample=<sample> --cores 12   # dry run
+snakemake    --configfile config/<sample>.yaml --config sample=<sample> --cores 12
+```
 
 ## Intended use
 
