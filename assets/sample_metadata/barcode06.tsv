@@ -1,0 +1,12 @@
+key	value	source
+data_source	JCU adaptive sampling run, KidGen CKD 33-gene panel (healthy volunteer), barcode06	lab records
+run_id	PBI88810_dd993839_aedf540f	config.yaml (lab run)
+platform	ONT PromethION	config.yaml (lab run)
+library	SQK-NBD114.24	config.yaml (lab run)
+targeting	Adaptive sampling	config.yaml (lab run)
+basecalling	Dorado 0.9.1, model dna_r10.4.1_e8.2_400bps_sup@v4.2.0, min Q10	basecalling run script
+alignment	minimap2 2.17-r941 (map-ont, GRCh38 no chr), samtools 1.18 sort	BAM @PG
+variants	Clair3, DeepVariant, Sniffles2, cuteSV	SignalScope run
+dorado_row	Dorado 0.9.1	dna_r10.4.1_e8.2_400bps_sup@v4.2.0	basecalling run script
+minimap2_row	minimap2 2.17-r941	-	BAM @PG
+deepvariant_row	1.10.0	ONT_R104 (--disable_small_model)	container deepvariant_1.10.0-gpu.sif

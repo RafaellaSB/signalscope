@@ -1,0 +1,38 @@
+# =============================================================================
+# SignalScope v1.10.0 - sample configuration (one per sample)
+#   cp config/sample.template.yaml config/<sample>.yaml   (then edit)
+#   snakemake --configfile config/<sample>.yaml --config sample=<sample> --cores 12
+# Values here override config.yaml. Replace every <...>.
+# =============================================================================
+mode: panel
+start_from: bam                          # bam: aligned reads (GRCh38) | pod5 | fastq
+existing_bam: <path/to/sample.bam>       # sorted and indexed (.bai next to it)
+samples_root: samples
+
+# Panel. The BED needs 4 columns: chrom, start, end, gene name. Contig names may be chr1 or 1.
+panel_bed: <path/to/panel.bed>
+report_bed: <path/to/panel.bed>          # usually the same BED
+deepvariant_bed: <path/to/panel.3col.bed> # the same intervals, first 3 columns only
+gene_intervals_ref: ''                   # empty = gene list from report_bed
+
+# Run details shown in the report
+run_id: <run or flow-cell id>
+sequencing_summary_file: <path/to/sequencing_summary.txt>   # from MinKNOW/Dorado, for the QC section
+report:
+  library: <library kit, e.g. SQK-NBD114.24>
+  basecalling: <basecaller and model, e.g. Dorado SUP v5.0.0>
+
+# Clair3 model: chosen automatically from the basecall_model tag in the BAM header.
+# Only if the header has no such tag, give the basecaller model here:
+clair3:
+  basecall_model: ''                     # e.g. dna_r10.4.1_e8.2_400bps_sup@v4.2.0
+
+# Decision tree
+decision_tree:
+  enabled: true
+  sample_sex: unknown                    # male | female | unknown (X/Y zygosity rules)
+  gene_table: ''                         # empty = built from the panel BED genes; or a curated table (README)
+  panel_name: <panel name, e.g. KidGen_CKD_33>
+  gnomad_remote: false                   # keep false for patient samples (no position leaves the server)
+  research_track: true                   # false when the participant did not consent to findings outside the panel
+  sample_metadata: ''                    # optional TSV of run details for the report (see assets/sample_metadata)

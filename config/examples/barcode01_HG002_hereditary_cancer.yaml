@@ -1,0 +1,25 @@
+# Example: ONT open dataset hereditary_cancer_2025.09, barcode01 = HG002 (GM24385, public GIAB
+# sample), ONT Hereditary Cancer Panel, adaptive sampling. Also used as
+# the release check. Replace <...> with the location of your copy of the data.
+mode: panel
+start_from: bam
+existing_bam: <path/to/barcode01.primary.bam>
+samples_root: samples
+panel_bed: assets/panel_beds/hcp_real_panel_noPMS2CL.bed
+report_bed: assets/panel_beds/hcp_real_panel_noPMS2CL.bed
+deepvariant_bed: assets/panel_beds/hcp_real_panel_noPMS2CL.3col.bed
+gene_intervals_ref: ''
+run_id: PBC83386_FC01_barcode01
+sequencing_summary_file: <path/to/sequencing_summary_hcp_barcode01.txt>
+report:
+  library: SQK-NBD114.24
+  basecalling: dna_r10.4.1_e8.2_400bps_hac@v4.3.0 (BAM header)
+clair3:
+  basecall_model: ''                     # BAM header: dna_r10.4.1_e8.2_400bps_hac@v4.3.0 -> clair3_pytorch_hac_v430
+decision_tree:
+  enabled: true
+  sample_sex: male
+  gene_table: assets/gene_tables/hcp_gene_table_panelapp.tsv   # 191 of the 257 target genes, PanelApp Australia green (cancer + cancer-predisposition panels, snapshot 16 Oct 2026)
+  panel_name: ONT_HCP_258
+  gnomad_remote: true                    # HG002 is public data
+  sample_metadata: assets/sample_metadata/barcode01.tsv

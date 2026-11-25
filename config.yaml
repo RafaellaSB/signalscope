@@ -1,0 +1,170 @@
+# =============================================================================
+# SignalScope v1.10.0 - site configuration (config.yaml)
+#
+# Snakemake always reads this file first. Fill in the paths in sections 1-4 ONCE for your
+# server. Everything about one sample (its BAM, panel, sex, ...) goes in a separate sample
+# config (copy config/sample.template.yaml), given on the command line:
+#   snakemake --configfile config/<sample>.yaml --config sample=<sample> --cores 12
+# Values in the sample config override the values here.
+#
+# Every value marked <...> must be replaced. Paths may be absolute or relative to this folder.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Tools on the host (conda environment, see README "Installation")
+# -----------------------------------------------------------------------------
+tools:
+  minimap2: minimap2
+  samtools: samtools
+  bcftools: bcftools
+  sniffles: sniffles
+  cutesv: cuteSV
+  mosdepth: mosdepth
+  nanoplot: NanoPlot
+  igv: <path/to/IGV_Linux_2.19.7/igv.sh>     # IGV desktop, used headless for the screenshots
+  dorado: <path/to/dorado/bin/dorado>         # only needed when starting from POD5 (start_from: pod5)
+
+# -----------------------------------------------------------------------------
+# 2. Containers (Apptainer images; see README "Containers")
+# -----------------------------------------------------------------------------
+deepvariant_sif: <path/to/deepvariant_1.10.0-gpu.sif>
+clair3:
+  sif: <path/to/clair3_v2.0.1_gpu.sif>
+  model_dir: <path/to/clair3_models>   # folder holding the installed Clair3 models
+  model: auto                          # auto = the installed model matching the basecaller model of the reads
+  model_prefix: clair3_pytorch_        # model folders usable by Clair3 2.x (PyTorch models)
+  basecall_model: ''                   # only for BAMs without a basecall_model tag, e.g. dna_r10.4.1_e8.2_400bps_sup@v4.2.0
+  model_check: stop                    # stop | warn: what to do when a named model does not match the reads
+vep:
+  sif: <path/to/ensembl-vep_release_116.0.sif>
+  cache: <path/to/vep_cache_116>       # VEP offline cache, GRCh38, release 116
+  plugins: <path/to/ensembl-vep/Plugins>
+  assembly: GRCh38
+  extra_flags: --everything --offline --format vcf --tab
+
+# -----------------------------------------------------------------------------
+# 3. Reference genome (GRCh38). chr-prefixed and Ensembl-style names both work: panel BEDs
+#    are harmonised to the reference contig names automatically.
+# -----------------------------------------------------------------------------
+ref_fasta: <path/to/GRCh38.fa>          # with .fai index next to it
+ref_mmi: ''                             # optional minimap2 index; empty = index built from ref_fasta
+
+# -----------------------------------------------------------------------------
+# 4. Annotation resources for the decision tree (see README "Annotation resources":
+#    where to download each file, its version and its licence)
+# -----------------------------------------------------------------------------
+resources:
+  clinvar_vcf:      <path/to/clinvar_GRCh38.vcf.gz>
+  clingen_genes:    <path/to/ClinGen_gene_curation_list_GRCh38.tsv>
+  clingen_regions:  <path/to/ClinGen_region_curation_list_GRCh38.tsv>
+  clingen_validity: <path/to/clingen_gene_validity.csv>
+  gene_constraint:  <path/to/gnomad.v4.1.constraint_metrics.tsv>
+  gnomad_sv:        <path/to/gnomad.v4.1.sv.sites.vcf.gz>
+  lr_sv:            <path/to/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.vcf.gz>  # long-read SV frequencies (Zenodo 10.5281/zenodo.14814308); empty = not used
+  gnomad_cache:     <path/to/gnomad_v4.1_lookup_cache.tsv>   # local gnomAD frequency cache (grows over runs)
+  gnomad_base:      "https://storage.googleapis.com/gcp-public-data--gnomad/release/4.1/vcf/{ds}/gnomad.{ds}.v4.1.sites.chr{chrom}.vcf.bgz"
+  mim2gene:         <path/to/mim2gene.txt>                   # OMIM; requires registration (see README)
+  region_index:     <path/to/ensembl116_region_index.tsv.gz> # built from the GTF on the first run if missing
+  gtf:              <path/to/Homo_sapiens.GRCh38.116.gtf.gz>
+  spliceai_env:     <path/to/spliceai_env>                   # conda env with SpliceAI, for variants without precomputed scores
+  vep_plugin_data:  <path/to/vep_plugins_data>               # holds revel/ and spliceai/ (see README)
+  sv_exon_bed:      <path/to/protein_coding_exons_pad20.bed> # genome-wide coding exons +-20 bp (see README)
+
+# =============================================================================
+# Pipeline settings. The defaults below are the benchmarked settings; change them only
+# with a reason (see README "Settings and benchmark").
+# =============================================================================
+mode: panel                 # panel | wgs
+start_from: bam             # bam | fastq | pod5
+samples_root: samples       # results go to <samples_root>/<sample>/
+threads: 12                 # threads per job; Snakemake --cores caps the total
+
+# DeepVariant small model: off (benchmark: no gain at 20x-40x, recall loss at 10x)
+deepvariant:
+  small_model: false
+
+# Structural variants: SVs of 50 bp or more, as in the benchmark
+sniffles:
+  minsvlen: 50
+  minsupport: auto
+cutesv:
+  min_support: 10           # cuteSV default, as benchmarked
+  min_size: 50
+  max_size: 5000000
+  max_cluster_bias_INS: 100
+  diff_ratio_merging_INS: 0.3
+  max_cluster_bias_DEL: 100
+  diff_ratio_merging_DEL: 0.3
+
+# Basecalling (start_from: pod5 only)
+pod5_base: pod5_pass
+dorado:
+  model: models/dorado/dna_r10.4.1_e8.2_400bps_sup@v5.0.0
+  extra_flags: --emit-fastq
+
+# Decision tree (Layer 3). Per-sample values (sex, gene table, panel name) go in the sample config.
+decision_tree:
+  enabled: true
+  sample_sex: unknown          # male | female | unknown
+  gene_table: ''               # empty = built from the panel BED
+  gene_table_old: ''
+  gene_table_exclude: []
+  panel_name: panel
+  gnomad_remote: false         # true sends variant POSITIONS to the public gnomAD files: keep false for patients
+  research_track: true         # false: leave out variants in genes outside the panel (no consent for such findings)
+  sample_metadata: ''
+  report_version: "1.10.0"
+
+# Report header
+report:
+  version: '1.10.0'
+  platform: ONT PromethION
+  library: <library kit, e.g. SQK-NBD114.24>
+  targeting: Adaptive sampling
+  basecalling: <basecaller and model, e.g. Dorado SUP v4.2.0>
+  alignment: minimap2 (GRCh38)
+  variants: Clair3, DeepVariant, Sniffles2, cuteSV
+  logo_filename: SignalScope_logo.png
+  minknow_version: ''
+report_date: ''
+
+igv:
+  genome: hg38
+  flank: 200
+  memory: 4g
+
+# WGS mode only (not used for panels)
+clinical_filtering:
+  wgs:
+    max_population_af: 0.001
+    min_caller_support: 2
+    max_shortlist: 50
+    max_igv_screenshots: 30
+
+# Optional modules, off by default
+methylation:
+  enabled: false
+  modkit_bin: modkit
+  clinical_bed: assets/clinical_methylation_loci.bed
+  min_coverage: 5
+  variant_window: 500
+phasing:
+  enabled: false             # WGS-only WhatsHap module; panel mode always phases in the decision tree (tree_phase)
+  whatshap_bin: whatshap     # full path if not on PATH (WhatsHap 1.7 tested); used by tree_phase (panel) and the WGS module
+# AlphaGenome (AVI): WGS mode only in this release. When enabled it SENDS VARIANTS to the
+# Google DeepMind AlphaGenome service; its terms of use exclude clinical use. Research use only.
+avi:
+  enabled: false
+  api_key_env: ALPHAGENOME_API_KEY
+  conda_env: alphagenome
+  max_workers: 4
+
+# Testing on a small region
+test_mode: false
+test_region: ''
+test_bed: ''
+
+# Legacy shortlist inputs (Layer 2), not used when decision_tree.enabled is true
+gene_context_ref: assets/wgs_placeholders/empty_gene_context.tsv
+gene_features_ref: assets/wgs_placeholders/empty_gene_features.tsv
+exon_boundaries_ref: assets/wgs_placeholders/empty_exon_boundaries.tsv

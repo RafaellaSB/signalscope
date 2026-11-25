@@ -1,0 +1,13 @@
+# ClinGen SVI BA1 exception list (Ghosh et al. 2018, Hum Mutat 39:1525, PMID 30311383).
+# Variants here are NOT made stand-alone Benign by BA1 even when popmax AF > 5%.
+# Matching is on gene + transcript-free HGVSc (MANE Select numbering).
+# VERIFY against the current ClinGen SVI list before release; the list is curated and can change.
+gene	hgvsc	label
+HFE	c.845G>A	p.Cys282Tyr
+HFE	c.187C>G	p.His63Asp
+GJB2	c.109G>A	p.Val37Ile
+ACAD9	c.-44_-41dup	5'UTR dupTAAT
+MEFV	c.1105C>T	p.Pro369Ser
+MEFV	c.1223G>A	p.Arg408Gln
+BTD	c.1330G>C	p.Asp444His
+PIBF1	c.1214G>A	p.Arg405Gln

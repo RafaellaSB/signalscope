@@ -1,0 +1,25 @@
+# Example: KidGen CKD panel (33 genes), adaptive sampling, healthy volunteer, run PBI88810.
+# The data are not public; the file shows the settings for a
+# BAM without a basecall_model tag and an Ensembl-style reference (contigs 1, 2, ...).
+mode: panel
+start_from: bam
+existing_bam: <path/to/barcode06.bam>
+samples_root: samples
+panel_bed: assets/panel_beds/RefSeq_kidgen_33_hg38_REPORT_NO_chr.bed
+report_bed: assets/panel_beds/RefSeq_kidgen_33_hg38_REPORT_NO_chr.bed
+deepvariant_bed: assets/panel_beds/RefSeq_kidgen_33_hg38_REPORT_NO_chr.3col.bed
+gene_intervals_ref: ''
+run_id: PBI88810_dd993839_aedf540f
+sequencing_summary_file: <path/to/sequencing_summary_PBI88810_dd993839_aedf540f.txt>
+report:
+  library: SQK-NBD114.24
+  basecalling: Dorado 0.9.1, dna_r10.4.1_e8.2_400bps_sup@v4.2.0
+clair3:
+  basecall_model: dna_r10.4.1_e8.2_400bps_sup@v4.2.0   # no tag in this BAM; from the basecalling run script
+decision_tree:
+  enabled: true
+  sample_sex: unknown
+  gene_table: assets/gene_tables/kidgen_gene_table.tsv
+  panel_name: KidGen_CKD_33
+  gnomad_remote: false
+  sample_metadata: assets/sample_metadata/barcode06.tsv

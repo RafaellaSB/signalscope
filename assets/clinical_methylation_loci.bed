@@ -1,0 +1,21 @@
+#chrom	start	end	gene	region	expected_methylation	clinical_context
+chr3	37034229	37035554	MLH1	promoter_CpG_island	low	Lynch syndrome. Promoter hypermethylation silences MLH1 mismatch repair. Found in ~15% of sporadic colorectal and endometrial cancers. Germline epimutation rare but reportable.
+chr17	43124984	43125584	BRCA1	promoter_CpG_island	low	Hereditary breast/ovarian cancer. Promoter methylation reported as alternative mechanism of BRCA1 inactivation in some tumour types.
+chr10	129467184	129468284	MGMT	promoter_CpG_island	low	Glioma treatment response. MGMT promoter methylation predicts temozolomide sensitivity. Relevant for neuro-oncology referrals.
+chrX	147911574	147912674	FMR1	promoter_CpG_island	low	Fragile X syndrome. Full mutation (>200 CGG repeats) causes hypermethylation and silencing. Methylation confirms full mutation status.
+chr11	2016405	2019065	H19	ICR_imprinting	intermediate	Beckwith-Wiedemann / Silver-Russell syndrome. H19/IGF2 imprinting control region. Hypermethylation or loss of methylation on maternal allele.
+chr15	25068745	25069545	SNRPN	ICR_imprinting	intermediate	Prader-Willi / Angelman syndrome. Methylation of maternal allele. Absence of methylation suggests PWS (paternal UPD or deletion).
+chr11	2699246	2700246	KCNQ1OT1	ICR_imprinting	intermediate	Beckwith-Wiedemann syndrome. KvDMR1 imprinting control region. Loss of methylation on maternal allele in ~50% of BWS cases.
+chr6	144328574	144329574	PLAGL1	ICR_imprinting	intermediate	Transient neonatal diabetes mellitus (TNDM). Loss of methylation at PLAGL1/ZAC1 DMR.
+chr7	12395735	12396735	GRB10	ICR_imprinting	intermediate	Silver-Russell syndrome. GRB10 imprinting region on chr7.
+chr7	130126012	130127012	MEST	ICR_imprinting	intermediate	Silver-Russell syndrome. MEST/PEG1 differentially methylated region.
+chr19	57285874	57286874	PEG3	ICR_imprinting	intermediate	Imprinting disorder. PEG3 differentially methylated region.
+chr20	58839674	58840674	GNAS	ICR_imprinting	intermediate	Pseudohypoparathyroidism / Albright hereditary osteodystrophy. GNAS complex locus DMR.
+chr13	48367484	48368484	RB1	promoter_CpG_island	low	Retinoblastoma. Promoter methylation as second hit in RB1 inactivation.
+chr3	10183318	10184318	VHL	promoter_CpG_island	low	Von Hippel-Lindau disease. Promoter methylation rare in germline but common somatic event in renal cell carcinoma.
+chr9	21964700	21965700	CDKN2A	promoter_CpG_island	low	Familial melanoma / pancreatic cancer. p16/CDKN2A promoter methylation as alternative inactivation mechanism.
+chr5	112043194	112044194	APC	promoter_1A	low	Familial adenomatous polyposis. APC promoter 1A methylation in serrated polyposis and some FAP cases.
+chr16	89804524	89805524	FANCA	promoter_CpG_island	low	Fanconi anaemia. Promoter methylation rarely reported as mechanism of biallelic inactivation.
+chr2	47596374	47597374	MSH2	promoter_CpG_island	low	Lynch syndrome. Constitutional MSH2 epimutation (heritable promoter methylation via EPCAM deletion or de novo).
+chr7	116398024	116399024	MET	promoter_CpG_island	low	Hereditary papillary renal cell carcinoma. MET promoter methylation status.
+chr1	120053818	120054818	NOTCH2	promoter_CpG_island	low	Alagille syndrome / Hajdu-Cheney syndrome. NOTCH2 regulatory methylation.

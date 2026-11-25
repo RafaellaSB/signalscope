@@ -1,0 +1,8 @@
+# SignalScope VCEP gene specifications (ClinGen CSpec registry: https://cspec.clinicalgenome.org)
+# Frequencies are gnomAD GroupMax FAF95 thresholds as fractions (0.005 = 0.5%).
+# A row is APPLIED ONLY when verified=yes: each value must be checked by a person against the
+# CSpec document in source_url, with the CSpec version and the date of the check filled in.
+# ba1_faf: stand-alone benign above this; also lowers the 2% shortlist filter for this gene
+# bs1_faf: strong benign above this; pp3_cap=yes: REVEL PP3/BP4 capped at Supporting
+gene	ba1_faf	bs1_faf	pp3_cap	in_silico_note	cspec_id	cspec_version	source_url	verified	verified_by	verified_date	note
+ATM	0.005		yes			 	https://cspec.clinicalgenome.org/cspec/ui/svi/	no			BA1 0.5% quoted by Sydney reviewer (Oct 2026); BS1 and version to be taken from CSpec

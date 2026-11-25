@@ -1,0 +1,375 @@
+# source=panelapp_au fetched=2026-10-16 panels=275:Kidneyome_SuperPanel(v11.63) min_confidence=green
+gene	hgnc_id	confidence	moi	moi_raw	panels	panel_versions	phenotypes
+ACE	HGNC:2707	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal tubular dysgenesis, MIM# 267430
+ACTG2	HGNC:145	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Visceral myopathy, MIM#	155310
+ACTN4	HGNC:166	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Glomerulosclerosis, focal segmental, 1, MIM#603278
+AFF3	HGNC:6473	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	KINSSHIP syndrome, MIM# 619297
+AGT	HGNC:333	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal tubular dysgenesis, MIM# 267430
+AGTR1	HGNC:336	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal tubular dysgenesis, MIM# 267430
+AGXT	HGNC:341	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperoxaluria, primary, type 1, MIM# 259900 | MONDO:0009823
+AHI1	HGNC:21575	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 3, MIM#608629
+AIRE	HGNC:360	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Autoimmune polyendocrinopathy syndrome , type I, with or without reversible metaphyseal dysplasia, OMIM #240300
+ALG5	HGNC:20266	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Multiple small kidney cysts, progressive interstitial fibrosis, and kidney function decline | Polycystic kidney disease 7, MIM# 620056
+ALG8	HGNC:23161	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Polycystic liver disease 3 with or without kidney cysts, MIM# 617874
+ALG9	HGNC:15672	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	ALG9-associated autosomal dominant polycystic kidney disease MONDO:0700000 | Congenital disorder of glycosylation, type Il, MIM#608776 | Gillessen-Kaesbach-Nishimura syndrome, MIM#263210 | Polycystic kidney disease
+ALMS1	HGNC:428	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+ALPL	HGNC:438	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypophosphatasia, adult, OMIM # 146300 | Hypophosphatasia, childhood, OMIM #241510 | Hypophosphatasia, infantile, OMIM #241500 | Odontohypophosphatasia, OMIM #146300
+AMMECR1	HGNC:467	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	Midface hypoplasia, hearing impairment, elliptocytosis, and nephrocalcinosis, MIM# 300990
+AMN	HGNC:14604	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Megaloblastic anemia-1, Norwegian type, MIM#261100
+ANKS6	HGNC:26724	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0014158 | Nephronophthisis 16, MIM# 615382
+ANOS1	HGNC:6211	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+AP2S1	HGNC:565	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hypocalciuric hypercalcaemia, type III, MIM# 600740 | MONDO:0010926
+APOA1	HGNC:600	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Amyloidosis, 3 or more types, MIM#105200
+APOA4	HGNC:602	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hereditary amyloidosis, MONDO:0018634, APOA4-related | Tubulointerstitial kidney disease, autosomal dominant 6, MIM#	621106
+APOE	HGNC:613	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Lipoprotein glomerulopathy, MIM#611771
+APRT	HGNC:626	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Adenine phosphoribosyltransferase deficiency, MIM#614723
+AQP2	HGNC:634	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Diabetes insipidus, nephrogenic MIM#125800
+ARHGDIA	HGNC:678	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+ARL13B	HGNC:25419	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 8, MIM# 612291
+ARL6	HGNC:13210	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 3, MIM# 600151
+ATP1A1	HGNC:799	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Charcot-Marie-Tooth disease, axonal, type 2DD, OMIM #618036 | Hypomagnesemia, seizures, and mental retardation 2, OMIM #618314
+ATP6V0A4	HGNC:866	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal tubular acidosis, distal, autosomal recessive, MIM#602722
+ATP6V1B1	HGNC:853	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Distal renal tubular acidosis 2 with progressive sensorineural hearing loss, MIM# 267300
+AVIL	HGNC:14188	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 21 MONDO:0032826
+AVP	HGNC:894	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Diabetes insipidus, neurohypophyseal MIM#125700
+AVPR2	HGNC:897	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	Diabetes insipidus, nephrogenic 304800 | Nephrogenic syndrome of inappropriate antidiuresis 300539
+B9D1	HGNC:24123	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Ciliopathy, MONDO:0005308, B9D1-related
+BBIP1	HGNC:28093	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 18, MIM#615995
+BBS1	HGNC:966	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 1, MIM# 209900
+BBS10	HGNC:26291	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 10, MIM# 615987
+BBS12	HGNC:26648	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 12, MIM# 615989
+BBS2	HGNC:967	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 2, MIM# 615981
+BBS4	HGNC:969	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 4, MIM#615982 | MONDO:0014433
+BBS5	HGNC:970	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 5, MIM#615983 | MONDO:0014434
+BBS7	HGNC:18758	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 7, MIM# 615984 | MONDO:0014435
+BBS9	HGNC:30000	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 9, MIM#615986 | MONDO:0014437
+BCS1L	HGNC:1020	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bjornstad syndrome MIM#262000 | GRACILE syndrome, MIM#603358 | Mitochondrial complex III deficiency, nuclear type MIM#112400
+BICC1	HGNC:19351	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Kidney disorder MONDO:0005240, BICC1-related
+BMP4	HGNC:1071	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	CAKUT
+BNC2	HGNC:30988	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Lower urinary tract obstruction, congenital | OMIM #618612
+BSND	HGNC:16512	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bartter syndrome, type 4a, MIM# 602522
+C1GALT1C1	HGNC:24338	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	Haemolytic uraemic syndrome, atypical, 8, with rhizomelic short stature, MIM# 301110
+C3	HGNC:1318	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	{Hemolytic uremic syndrome, atypical, susceptibility to, 5}, MIM# 612925
+CA2	HGNC:1373	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Osteopetrosis, autosomal recessive 3, with renal tubular acidosis, MIM#259730
+CACNA1D	HGNC:1391	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	MONDO:0014200 | Primary aldosteronism, seizures, and neurologic abnormalities, MIM# 615474
+CACNA1H	HGNC:1395	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hyperaldosteronism, familial, type IV MIM#617027 | MONDO:0014875
+CACNA1S	HGNC:1397	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hypokalemic periodic paralysis, type 1, MIM# 170400
+CASR	HGNC:1514	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hypocalcemia, autosomal dominant, with Bartter syndrome, MIM#601198 | Hypocalciuric hypercalcemia, type I, MIM# 145980
+CC2D2A	HGNC:29253	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Meckel syndrome 6, MIM# 612284
+CCNQ	HGNC:28434	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	syndactyly-telecanthus-anogenital and renal malformations syndrome MONDO:0010408
+CD151	HGNC:1630	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephropathy with pretibial epidermolysis bullosa and deafness, MIM#609057
+CD2AP	HGNC:14258	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	focal segmental glomerulosclerosis 3, susceptibility to MONDO:0011917
+CD46	HGNC:6953	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Atypical hemolytic uremic syndrome 2 | {Susceptibility to atypical hemolytic uremic syndrome 2} (MIM#612922), AD, AR
+CDC73	HGNC:16783	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hyperparathyroidism, familial primary, MIM# 145000 | Hyperparathyroidism-jaw tumour syndrome, MIM# 145001
+CDKN1B	HGNC:1785	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Multiple endocrine neoplasia type 4, MEN4, OMIM #610755
+CDX2	HGNC:1806	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Congenital abnormalities of anus, renal and urogenital system, vertebrae and/or the limbs | Genetic multiple congenital anomalies/dysmorphic syndrome, MONDO:0043005
+CELSR3	HGNC:3230	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Neurodevelopmental disorder (MONDO#0700092), CELSR3-related
+CENPF	HGNC:1857	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Stromme syndrome, MIM#243605
+CEP164	HGNC:29182	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome | Nephronophthisis 15, MIM# 614845 | Oro-facio-digital syndrome
+CEP290	HGNC:29021	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Senior-Loken syndrome 6, MIM# 610189
+CEP55	HGNC:1161	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Multinucleated neurons, anhydramnios, renal dysplasia, cerebellar hypoplasia, and hydranencephaly, MIM#236500
+CEP83	HGNC:17966	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	ID | MONDO:0014374 | Nephronophthisis 18, MIM# 615862 | Retinal dystrophy
+CFB	HGNC:1037	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Haemolytic uremic syndrome, atypical, susceptibility to, 4, MIM# 612924
+CFH	HGNC:4883	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	{Haemolytic uremic syndrome, atypical, susceptibility to, 1} MIMI#235400
+CFHR1	HGNC:4888	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	{Hemolytic uremic syndrome, atypical, susceptibility to} MIM#235400
+CFHR2	HGNC:4890	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	C3 glomerulopathy | C3G | IC-MPGN | Immune complex MPGN
+CFHR3	HGNC:16980	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	{Hemolytic uremic syndrome, atypical, susceptibility to} MIM#235400
+CFHR5	HGNC:24668	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Nephropathy due to CFHR5 deficiency, MIM#614809
+CFI	HGNC:5394	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	{Haemolytic uremic syndrome, atypical, susceptibility to, 3} MIM#612923
+CHAF1A	HGNC:1910	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	oculoauriculovertebral spectrum with radial defects  MONDO:0007712, CHAF1A-related
+CHD7	HGNC:20626	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	CHARGE syndrome MIM#214800
+CHRNA3	HGNC:1957	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bladder dysfunction, autonomic, with impaired pupillary reflex and secondary CAKUT, MIM# 191800
+CLCN2	HGNC:2020	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hyperaldosteronism, familial, type II 605635
+CLCN5	HGNC:2023	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Dent disease, MIM#300009 | Hypophosphatemic rickets, MIM#300554 | Nephrolithiasis, type I, MIM#310468 | Proteinuria, low molecular weight, with hypercalciuric nephrocalcinosis, MIM#308990
+CLCNKB	HGNC:2027	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bartter syndrome, type 3, MIM# 607364 | Bartter syndrome, type 4b, digenic, MIM# 613090
+CLDN10	HGNC:2033	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	HELIX syndrome, MIM#617671
+CLDN16	HGNC:2037	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypomagnesemia 3, renal MIM#248250 | amelogenesis imperfecta MONDO#0019507, CLDN16-related
+CLDN19	HGNC:2040	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypomagnesaemia 5, renal, with ocular involvement, MIM#248190
+CNNM2	HGNC:103	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypomagnesemia 6, renal MIM#613882 | Hypomagnesemia, seizures, and mental retardation MIM#616418
+COL4A1	HGNC:2202	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Angiopathy, hereditary, with nephropathy, aneurysms, and muscle cramps, MIM#	611773 | Angiopathy, hereditary, with nephropathy, aneurysms, and muscle cramps, MIM#611773
+COL4A3	HGNC:2204	green	AD/AR/unknown	BOTH monoallelic and biallelic, autosomal or pseudoautosomal | Unknown	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Alport syndrome 2, autosomal recessive, MIM# 203780 | Alport syndrome 3, autosomal dominant, MIM# 104200
+COL4A4	HGNC:2206	green	AD/AR/unknown	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal | Unknown	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Alport syndrome 2, autosomal recessive, 203780 | Focal segmental glomerulosclerosis (FSGS), AD | Thin basement membrane nephropathy (TBMN), AD
+COL4A5	HGNC:2207	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Alport syndrome 1, X-linked, MIM# 301050
+COQ2	HGNC:25223	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Coenzyme Q10 deficiency, primary, 1, MIM# 607426 | MONDO:0011829
+COQ6	HGNC:20233	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+COQ8B	HGNC:19041	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 9, MIM#615573
+CPT2	HGNC:2330	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	CPT II deficiency, infantile 600649 | CPT II deficiency, lethal neonatal 608836 | CPT II deficiency, myopathic, stress-induced 255110
+CRB2	HGNC:18688	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Ventriculomegaly with cystic kidney disease, MIM#	219730 | Ventriculomegaly with cystic kidney disease, MIM# 219730
+CSPP1	HGNC:26193	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 21, MIM# 615636 | MONDO:0014288
+CTNS	HGNC:2518	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cystinosis, nephropathic MIM#219800
+CTU2	HGNC:28005	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Microcephaly, facial dysmorphism, renal agenesis, and ambiguous genitalia syndrome
+CUBN	HGNC:2548	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+CUL3	HGNC:2553	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Pseudohypoaldosteronism, type IIE, MIM# 614496
+CYP11B1	HGNC:2591	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Aldosteronism, glucocorticoid-remediable, MIM#	103900
+CYP11B2	HGNC:2592	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hypoaldosteronism, congenital, due to CMO I deficiency (MIM#203400) or due to CMO II deficiency (MIM#610600)
+CYP17A1	HGNC:2593	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	17-alpha-hydroxylase/17,20-lyase deficiency, MIM# 202110
+CYP21A2	HGNC:2600	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Adrenal hyperplasia, congenital, due to 21-hydroxylase deficiency, 201910 | Hyperandrogenism, nonclassic type, due to 21-hydroxylase deficiency, 201910
+CYP24A1	HGNC:2602	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypercalcaemia, infantile, 1, MIM# 143880 | MONDO:0020739
+CYP27B1	HGNC:2606	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Vitamin D-dependent rickets, type I MIM#264700
+CYP2R1	HGNC:20580	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Rickets due to defect in vitamin D 25-hydroxylation deficiency MIM#600081
+CYS1	HGNC:18525	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Polycystic kidney disease MONDO:0020642, CYS1-related
+DAAM2	HGNC:18143	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 24, MIM# 619263 | steroid-resistant nephrotic syndrome (SRNS)
+DCDC2	HGNC:18141	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis 19, MIM# 616217
+DGKE	HGNC:2852	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 7, MIM# 615008
+DHCR7	HGNC:2860	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	OMIM #270400 | Smith-Lemli-Opitz syndrome
+DLC1	HGNC:2897	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Neprhotic syndrome
+DLG5	HGNC:2904	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Yuksel-Vogel-Bauer syndrome, MIM#620703
+DMP1	HGNC:2932	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypophosphatemic rickets MIM#241520
+DNAJB11	HGNC:14889	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal | MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Ivermark II syndrome. | Polycystic kidney disease 6 with or without polycystic liver disease, MIM#618061
+DYNC2H1	HGNC:2962	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0013127MONDO:0013127 | Short-rib thoracic dysplasia 3 with or without polydactyly, MIM# 613091
+DYNC2I1	HGNC:21862	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Short-rib thoracic dysplasia 8 with or without polydactyly, MIM# 615503
+DYRK1A	HGNC:3091	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Mental retardation, autosomal dominant 7 (MIM#614104)
+DZIP1L	HGNC:26551	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Polycystic kidney disease 5, MIM#617610
+EGFR	HGNC:3236	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Inflammatory skin and bowel disease, neonatal 2, MONDO:0014481
+EHHADH	HGNC:3247	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Fanconi renotubular syndrome 3, MIM#615605
+ENPP1	HGNC:3356	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Arterial calcification, generalized, of infancy, 1, MIM# 208000 | Cole disease, MIM# 615522 | Hypophosphatemic rickets, autosomal recessive, 2, MIM# 613312
+EXOC3L2	HGNC:30162	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Brain malformation renal syndrome, MIM#	620943
+EYA1	HGNC:3519	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+FAH	HGNC:3579	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Tyrosinemia type I MONDO:0010161
+FAM111A	HGNC:24725	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	autosomal dominant Kenny-Caffey syndrome MONDO:0007478
+FAM20A	HGNC:23015	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Amelogenesis imperfecta, type IG (enamel-renal syndrome) MIM#204690
+FAM20C	HGNC:22140	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0009821 | Raine syndrome, MIM# 259775
+FAN1	HGNC:29170	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Interstitial nephritis, karyomegalic, MIM#	614817 | Interstitial nephritis, karyomegalic, MIM# 614817
+FAT1	HGNC:3595	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Focal segmental glomerulosclerosis (MONDO:0100313), FAT1-related
+FGA	HGNC:3661	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Amyloidosis, familial visceral, MIM#105200
+FGF23	HGNC:3680	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	autosomal dominant hypophosphatemic rickets MONDO:0008660 | familial hyperphosphatemic tumoral calcinosis/hyperphosphatemic hyperostosis syndrome MONDO:0100251
+FLCN	HGNC:27310	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Birt-Hogg-Dube syndrome, MIM#	135150
+FN1	HGNC:3778	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Glomerulopathy with fibronectin deposits 2, MIM#	601894
+FOXI1	HGNC:3815	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	autosomal recessive distal renal tubular acidosis MONDO:0018440
+FOXP1	HGNC:3823	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Mental retardation with language impairment and with or without autistic features, MIM#	613670
+FRAS1	HGNC:19185	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+FREM1	HGNC:23399	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bifid nose with or without anorectal and renal anomalies, MIM# 608980 | Manitoba oculotrichoanal syndrome 248450
+FREM2	HGNC:25396	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+GALNT3	HGNC:4125	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Tumoral calcinosis, hyperphosphatemic, familial, 1, MIM# 211900
+GANAB	HGNC:4138	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Polycystic kidney disease 3, MIM# 600666
+GATA3	HGNC:4172	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hypoparathyroidism, sensorineural deafness, and renal dysplasia, MIM# 146255 | Hypoparathyroidism, sensorineural deafness, and renal dysplasia, OMIM #146255
+GATM	HGNC:4175	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Fanconi renotubular syndrome 1, MIM# 134600
+GCM2	HGNC:4198	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperparathyroidism 4, OMIM #617343 | Hypoparathyroidism, familial isolated 2, OMIM #618883
+GDF6	HGNC:4221	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Syndromic CAKUT
+GFRA1	HGNC:4243	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal hypodysplasia/aplasia 4, MIM# 619887
+GLA	HGNC:4296	green	XLD/XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females | X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Fabry disease (MIM# 301500) | Fabry disease, MIM#	301500
+GLI3	HGNC:4319	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Pallister-Hall syndrome, MIM# 146510
+GLIS2	HGNC:29450	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0012680 | Nephronophthisis 7, OMIM#611498
+GNA11	HGNC:4379	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hypocalcemia, autosomal dominant 2 MIM#615361 | Hypocalciuric hypercalcemia, type II MIM#145981
+GNAS	HGNC:4392	green	AD	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)	Kidneyome_SuperPanel	275:11.63	Osseous heteroplasia, progressive (166350) AD | Pituitary adenoma 3, multiple types, somatic (617686) | Pseudohypoparathyroidism Ia (103580) AD | Pseudohypoparathyroidism Ib (603233) AD | Pseudohypoparathyroidism Ic (612462) AD | Pseudopseudohypoparathyroidism (612463)
+GON7	HGNC:20356	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 9, MIM# 619603
+GPC3	HGNC:4451	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+GPNMB	HGNC:4462	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	amyloidosis, primary localized cutaneous, 3 MONDO:0054765
+GREB1L	HGNC:31042	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Renal hypodysplasia/aplasia 3, OMIM# 617805
+GRHPR	HGNC:4570	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperoxaluria, primary, type II, MIM# 260000 | MONDO:0009824
+GRIP1	HGNC:18708	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	CAKUT | Fraser syndrome 3 MIM#617667
+GSN	HGNC:4620	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Amyloidosis, Finnish type, MIM#105200
+HAAO	HGNC:4796	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Vertebral, cardiac, renal, and limb defects syndrome 1, MIM#617660
+HNF1B	HGNC:11630	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel; Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63; 275:11.63; 275:11.63	Diabetes mellitus, noninsulin-dependent 125853 AD | Renal cysts and diabetes syndrome 137920 AD | Renal cysts and diabetes syndrome, MIM# 137920 | Renal cysts and diabetes syndrome, MIM#137920 | {Renal cell carcinoma} 144700
+HNF4A	HGNC:5024	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Fanconi renotubular syndrome 4, with maturity-onset diabetes of the young, OMIM #616026 | MODY, type I, OMIM # 125850
+HOGA1	HGNC:25155	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperoxaluria, primary, type III MIM#613616
+HOXA13	HGNC:5102	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+HPRT1	HGNC:5157	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	HPRT-related gout (MIM# 300323) | Lesch-Nyhan syndrome (MIM# 300322)
+HPSE2	HGNC:18374	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Urofacial syndrome 1 MIM#236730
+HS2ST1	HGNC:5193	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Neurofacioskeletal syndrome with or without renal agenesis, MIM#619194
+HSD11B2	HGNC:5209	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Apparent mineralocorticoid excess, MIM# 218030 | MONDO:0009025
+HSD3B2	HGNC:5218	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Adrenal hyperplasia, congenital, due to 3-beta-hydroxysteroid dehydrogenase 2 deficiency, MIM# 201810
+HSPA9	HGNC:5244	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Even-plus syndrome, MONDO:0014801
+IFT122	HGNC:13556	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cranioectodermal dysplasia 1, MIM# 218330 | MONDO:0021093
+IFT140	HGNC:29077	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal | MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Cranioectodermal dysplasia 5, MIM# 621180 | MONDO:0009964 | Short-rib thoracic dysplasia 9 with or without polydactyly, MIM# 266920 | {Polycystic kidney disease 9, susceptibility to} MIM#621164
+IFT172	HGNC:30391	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 20, MIM# 619471 | Short-rib thoracic dysplasia 10 with or without polydactyly, MIM# 615630
+IFT27	HGNC:18626	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 19, MIM#615996
+IFT43	HGNC:29669	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cranioectodermal dysplasia 3, MIM# 614099 | Short-rib thoracic dysplasia 18 with polydactyly, MIM# 617866
+IFT56	HGNC:21882	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Biliary, renal, neurologic, and skeletal syndrome, MIM# 619534 | Ciliopathy Syndrome with Biliary, Renal, Neurological, and Skeletal Manifestations
+IFT74	HGNC:21424	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 20 617119
+INF2	HGNC:23791	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Charcot-Marie-Tooth disease, dominant intermediate E, MIM# 614455 | Glomerulosclerosis, focal segmental, 5, MIM# 613237
+INPP5E	HGNC:21474	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 1, MIM# 213300 | MONDO:0008944
+INVS	HGNC:17870	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis 2, infantile, (MIM#602088)
+IQCB1	HGNC:28949	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0012225 | Senior-Loken syndrome 5, MIM# 609254
+ITGA3	HGNC:6139	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Interstitial lung disease, nephrotic syndrome, and epidermolysis bullosa, congenital, MIM# 614748
+ITGA8	HGNC:6144	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal hypodysplasia/aplasia 1, MIM# 191830
+ITSN1	HGNC:6183	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome
+ITSN2	HGNC:6184	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome
+JAG1	HGNC:6188	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Alagille syndrome, MIM#118450 | Alagille syndrome, MONDO:0007318 | JAG1-related autosomal dominant tubulointerstitial kidney disease
+KANK2	HGNC:29300	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 16, MIM#617783
+KCNA1	HGNC:6218	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Episodic ataxia/myokymia syndrome MIM#160120
+KCNJ1	HGNC:6255	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bartter syndrome, type 2, MIM#241200
+KCNJ10	HGNC:6256	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	SESAME syndrome, MIM# 612780
+KCNJ16	HGNC:6262	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Inherited renal tubular disease, MONDO:0015962, KCNJ16-related | Renal tubulopathy | deafness
+KCNJ5	HGNC:6266	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hyperaldosteronism, familial, type III, MIM# 613677
+KDM2B	HGNC:13610	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Neurodevelopmental disorder with congenital cardiac defects and variable renal and ocular abnormalities, MIM# 621474
+KDM6A	HGNC:12637	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+KIF14	HGNC:19181	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	?Meckel syndrome 12, OMIM #616258 | Microcephaly 20, primary, autosomal recessive, OMIM #617914
+KLHL3	HGNC:6354	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Pseudohypoaldosteronism, type IID, MIM# 614495
+KMT2D	HGNC:7133	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+KYNU	HGNC:6469	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Vertebral, cardiac, renal, and limb defects syndrome 2, MIM#617661
+LAGE3	HGNC:26058	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 2, X-linked, MIM# 301006
+LAMA5	HGNC:6485	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 26 620049
+LAMB2	HGNC:6487	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 5, with or without ocular abnormalities, MIM# 614199 | Pierson syndrome, MIM# 609049
+LCAT	HGNC:6522	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Fish-Eye disease, MIM# 136120 | Norum disease MIM#245900 | Norum disease, MIM#	245900
+LHX1	HGNC:6593	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Mayer-Rokitansky-Kuster-Hauser syndrome, MONDO:0017771, LHX1-related
+LIFR	HGNC:6597	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	CAKUT MONDO:0019719, LIFR-related
+LMX1B	HGNC:6654	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Focal segmental glomerulosclerosis-10 (FSGS10), MIM#256020 | LMX1B-related nephropathy | Nail-patella syndrome (MIM#161200), MONDO:0008061
+LRIG2	HGNC:20889	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Urofacial syndrome 2, MIM# 615112
+LRP2	HGNC:6694	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Donnai-Barrow syndrome, MIM#222448
+LRP4	HGNC:6696	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+LYZ	HGNC:6740	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Amyloidosis, renal, MIM#105200
+LZTFL1	HGNC:6741	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 17 (MIM#615994)
+MAFB	HGNC:6408	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Multicentric carpotarsal osteolysis syndrome, OMIM#166300
+MAGED2	HGNC:16353	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	Bartter syndrome, type 5, antenatal, transient, MIM# 300971
+MAGI2	HGNC:18957	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 15, MIM# 617609
+MAPKBP1	HGNC:29536	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0014997 | Nephronophthisis 20, MIM# 617271
+MBTPS2	HGNC:15455	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	IFAP syndrome with or without BRESHECK syndrome MONDO:0100213
+MEN1	HGNC:7010	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Multiple endocrine neoplasia 1 MIM#131100
+MKKS	HGNC:7108	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 6 (MIM#605231) | McKusick-Kaufman syndrome, MIM# 236700
+MKS1	HGNC:7121	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 13, MIM# 615990 | MONDO:0014441 | Meckel syndrome 1, MIM# 249000
+MMACHC	HGNC:24525	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Methylmalonic aciduria and homocystinuria, cblC type, MIM#277400
+MMUT	HGNC:7526	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Methylmalonic aciduria, mut(0) type, MIM# 251000
+MOCOS	HGNC:18234	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Xanthinuria type II, MIM#603592
+MTX2	HGNC:7506	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Mandibuloacral dysplasia | Mandibuloacral dysplasia progeroid syndrome, MIM# 619127 | arterial calcification | lipodystrophy
+MUC1	HGNC:7508	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Medullary cystic kidney disease 1 (MIM#174000) | Medullary cystic kidney disease 1, MIM# 174000
+MYH9	HGNC:7579	green	AD/unknown	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted | Unknown	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Macrothrombocytopenia and granulocyte inclusions with or without nephritis or sensorineural hearing loss, MIM# 155100
+MYO1E	HGNC:7599	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Glomerulosclerosis, focal segmental, 6, MIM# 614131
+MYOCD	HGNC:16067	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Megabladder | cardiomyopathy | congenital heart disease
+NADSYN1	HGNC:29832	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Vertebral, cardiac, renal, and limb defects syndrome 3, MONDO:0030077 | Vertebral, cardiac, renal, and limb defects syndrome 3, OMIM:618845
+NEK1	HGNC:7744	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Short-rib thoracic dysplasia 6 with or without polydactyly, MIM# 263520
+NEK8	HGNC:13387	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal | MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Familial renal cystic disease MONDO:0019741, NEK8-related, dominant | MONDO:0014174 | Polycystic kidney disease 8, MIM# 620903 | Renal-hepatic-pancreatic dysplasia 2, MIM# 615415
+NFIA	HGNC:7784	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Brain malformations with or without urinary tract defects - MIM#613735
+NIPBL	HGNC:28862	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+NLRP3	HGNC:16400	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Muckle-Wells syndrome, MIM#191900
+NOS1AP	HGNC:16859	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 22, MIM# 619155
+NOTCH2	HGNC:7882	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Alagille syndrome 2 (MIM#610205) | Hajdu-Cheney syndrome (MIM#102500)
+NPHP1	HGNC:7905	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis 1, juvenile, MIM# 256100
+NPHP3	HGNC:7907	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Nephronophthisis 3, MIM# 604387 | Renal-hepatic-pancreatic dysplasia 1, MIM# 208540
+NPHP4	HGNC:19104	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis 4, MIM# 606966 | Senior-Loken syndrome 4, MIM# 606996
+NPHS1	HGNC:7908	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+NPHS2	HGNC:13394	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 2 (MIM#600995), AR
+NPNT	HGNC:27405	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal agenesis, MONDO:0018470, NPNT-related
+NPR1	HGNC:7943	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Genetic hypertension MONDO:0015512
+NR3C1	HGNC:7978	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Glucocorticoid resistance, OMIM # 615962
+NR3C2	HGNC:7979	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	MONDO:0008329 | Pseudohypoaldosteronism type I, autosomal dominant, MIM# 177735
+NR6A1	HGNC:7985	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Oculovertebral syndrome, MIM# 621277
+NUP107	HGNC:29914	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 7, MIM# 618348
+NUP133	HGNC:18016	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 18, MIM#618177
+NUP160	HGNC:18017	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 19, MIM#618178
+NUP85	HGNC:8734	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 17, MIM#618176
+NUP93	HGNC:28958	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 12, MIM#616892
+OCRL	HGNC:8108	green	XLD/XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females | X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Dent disease 2, MIM #300555 | Dent disease 2, MIM#300555 | Lowe syndrome, MIM# 309000 | Lowe syndrome, MIM#309000
+OFD1	HGNC:2567	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 10, MIM# 300804 | Orofaciodigital syndrome I, MIM# 311200
+OSGEP	HGNC:18028	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 3, MIM# 617729
+OSMR	HGNC:8507	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	primary cutaneous amyloidosis MONDO:0015301
+P3H2	HGNC:19317	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Myopia, high, with cataract and vitreoretinal degeneration (MIM# 614292) | Proteinuria, P3H2-related MONDO:0003634
+PAN2	HGNC:20074	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Developmental delay with variable cardiac and renal congenital anomalies and dysmoprhic facies, MIM#	621384
+PAX2	HGNC:8616	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Glomerulosclerosis, focal segmental, 7, MIM#616002 | Papillorenal syndrome, MIM# 120330 | Renal coloboma syndrome, MONDO:0007352
+PBX1	HGNC:8632	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Congenital anomalies of kidney and urinary tract syndrome with or without hearing loss, abnormal ears, or developmental delay, OMIM #617641
+PCBD1	HGNC:8646	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperphenylalaninemia, BH4-deficient, D, MIM# 264070
+PDE3A	HGNC:8778	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hypertension and brachydactyly syndrome, MIM# 112410
+PDIA6	HGNC:30168	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	multiple congenital anomalies, MONDO:0019042, PDIA6-related
+PDSS2	HGNC:23041	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+PHEX	HGNC:8918	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	Hypophosphatemic rickets, X-linked dominant | OMIM #307800
+PKD1	HGNC:9008	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Polycystic kidney disease 1, MIM# 173900
+PKD2	HGNC:9009	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Polycystic kidney disease 2, MIM#613095 AD
+PKHD1	HGNC:9016	green	AD/AR	BIALLELIC, autosomal or pseudoautosomal | BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Polycystic kidney disease 4, with or without hepatic disease, MIM#	263200 | Polycystic kidney disease 4, with or without hepatic disease, MIM# 263200
+PLCE1	HGNC:17175	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 3, MIM# 610725
+PMM2	HGNC:9115	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperinsulinaemic Hypoglycaemia and Polycystic Kidney Disease (HIPKD), MONDO:0020642, PMM2-related
+PODXL	HGNC:9171	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome
+PRKCSH	HGNC:9411	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Polycystic liver disease 1, MIM# 174050, with or without kidney cysts
+PSKH1	HGNC:9529	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cholestasis, progressive familial intrahepatic, 13, MIM# 620962
+PTH	HGNC:9606	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypoparathyroidism, familial isolated 1, MIM# 146200
+PTH1R	HGNC:9608	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Chondrodysplasia, Blomstrand type MIM#215045 | Eiken syndrome MIM#600002 | Failure of tooth eruption, primary MIM#125350 | Metaphyseal chondrodysplasia, Murk Jansen type MIM#156400
+PTPRO	HGNC:9678	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 6, MIM# 614196
+REN	HGNC:9958	green	AD/AR	BIALLELIC, autosomal or pseudoautosomal | MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Autosomal dominant tubulointerstitial disease | Renal tubular dysgenesis, MIM# 267430
+RET	HGNC:9967	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	CAKUT MONDO:0019719, RET-related | Multiple endocrine neoplasia IIA, MIM# 171400 | Multiple endocrine neoplasia IIB, MIM# 162300
+RMND1	HGNC:21176	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Combined oxidative phosphorylation deficiency 11 MIM#614922
+ROBO1	HGNC:10249	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Neurooculorenal syndrome, MIM#	620305
+ROBO2	HGNC:10250	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	CAKUT | Vesicoureteral reflux 2 - MIM#610878
+ROR2	HGNC:10257	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+RPGRIP1L	HGNC:29168	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	COACH syndrome 3, MIM# 619113 | Joubert syndrome 7, MIM# 611560 | Meckel syndrome 5, MIM# 611561 | Nephronophthisis
+RRAGD	HGNC:19903	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Inherited renal tubular disease, MONDO:0015962, RRAGD-related | dilated cardiomyopathy | hypomagnesaemia | nephrocalcinosis | renal salt-wasting
+RRM2B	HGNC:17296	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Mitochondrial DNA depletion syndrome 8A (encephalomyopathic type with renal tubulopathy) MIM#612075 | Mitochondrial DNA depletion syndrome 8B (MNGIE type) MIM#612075 | Rod-cone dystrophy, sensorineural deafness, and Fanconi-type renal dysfunction, MIM# 268315
+SALL1	HGNC:10524	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+SALL4	HGNC:15924	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	SALL4- related disorders
+SARS2	HGNC:17697	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	neurodevelopmental disorder MONDO#070009, SARS1-related
+SCARB2	HGNC:1665	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Epilepsy, progressive myoclonic 4, with or without renal failure, MIM #254900 | Progressive Myoclonus Epilepsy, MONDO:0020074
+SCLT1	HGNC:26406	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome | Senior-Loken syndrome
+SCN4A	HGNC:10591	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hyperkalemic periodic paralysis, type 2, MIM# 170500 | Hypokalemic periodic paralysis, type 2, MIM# 613345 | Myasthenic syndrome, congenital, 16, MIM# 614198 | Myotonia congenita, atypical, acetazolamide-responsive , MIM#608390 | Paramyotonia congenita , MIM#168300
+SCNN1A	HGNC:10599	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	?Liddle syndrome 3 618126 AD | Bronchiectasis with or without elevated sweat chloride 2 613021 AD | Pseudohypoaldosteronism, type I 264350 AR.
+SCNN1B	HGNC:10600	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Liddle syndrome 1, MIM# 177200 | Pseudohypoaldosteronism, type I, MIM# 264350
+SCNN1G	HGNC:10602	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Liddle syndrome 2, MIM# 618114 | Pseudohypoaldosteronism, type I, MIM# 264350
+SDCCAG8	HGNC:10671	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 16, MIM# 615993 | MONDO:0013326 | MONDO:0014444 | Nephronophthisis | Senior-Loken syndrome 7, MIM# 613615
+SEC61A1	HGNC:18276	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Hyperuricemic nephropathy, familial juvenile, 4, MIM# 617056
+SEC63	HGNC:21082	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Polycystic liver disease 2, MIM#617004
+SGPL1	HGNC:10817	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	RENI syndrome (MIM#617575)
+SHROOM4	HGNC:29215	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	Congenital anomaly of the kidney and urinary tracy (CAKUT), SHROOM4-related, MONDO:0019719
+SLC12A1	HGNC:10910	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bartter syndrome, type 1, OMIM #601678
+SLC12A3	HGNC:10912	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Gitelman syndrome, MIM# 263800
+SLC20A1	HGNC:10946	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Bladder-Exstrophy-Epispadias Complex (BEEC), MONDO:0017919, SLC20A1-related
+SLC22A12	HGNC:17989	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypouricemia, renal, MIM# 220150, MONDO:0020728
+SLC2A2	HGNC:11006	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Fanconi-Bickel syndrome, MIM# 227810
+SLC2A9	HGNC:13446	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypouricaemia, renal, 2, MIM# 612076
+SLC34A1	HGNC:11019	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypercalcaemia, infantile, 2 MIM#616963 | Nephrolithiasis/osteoporosis, hypophosphatemic, 1 612286
+SLC34A3	HGNC:20305	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Hypophosphataemic rickets with hypercalciuria, (MIM#241530)
+SLC3A1	HGNC:11025	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cystinuria, MIM# 220100
+SLC4A1	HGNC:11027	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Distal renal tubular acidosis 1, MIM# 179800 | Distal renal tubular acidosis 4 with haemolytic anaemia, MIM# 611590 | MONDO:0008368 | MONDO:0012700
+SLC4A4	HGNC:11030	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hemiplegic migraine | Renal tubular acidosis, proximal, with ocular abnormalities, MIM# 604278
+SLC5A2	HGNC:11037	green	AD/AR	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Renal glucosuria, MIM#	233100
+SLC6A19	HGNC:27960	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hartnup disorder, MIM# 234500 | Hyperglycinuria, MIM# 138500 | Iminoglycinuria, MIM# 242600
+SLC7A7	HGNC:11065	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Lysinuric protein intolerance, MIM# 222700
+SLC7A9	HGNC:11067	green	AD/AR	BOTH monoallelic and biallelic, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cystinuria, MIM# 220100
+SMARCAL1	HGNC:11102	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+SON	HGNC:11183	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	ZTTK syndrome, MIM# 617140
+STRA6	HGNC:30650	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Microphthalmia, isolated, with coloboma 8, MIM#601186
+STRADA	HGNC:30172	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	OMIM #611087 | Polyhydramnios, megalencephaly, and symptomatic epilepsy
+STX16	HGNC:11431	green	AD	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)	Kidneyome_SuperPanel	275:11.63	Pseudohypoparathyroidism, type IB, MIM#603233
+TBC1D1	HGNC:11578	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Non-syndromic renal or urinary tract malformation, MONDO:0019720
+TBC1D8B	HGNC:24715	green	XLD	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome, type 20, MIM# 301028
+TBCE	HGNC:11582	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypoparathyroidism-retardation-dysmorphism syndrome, OMIM #241410
+TBX18	HGNC:11595	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Congenital anomalies of kidney and urinary tract 2, MIM# 143400
+TBX6	HGNC:11605	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Combined skeletal-kidney dysplasia syndrome | Mayer-Rokitansky-Küster-Hauser syndrome, MONDO:0017771, TBX6-related
+TCTN2	HGNC:25774	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 24, MIM# 616654 | MONDO:0013482 | MONDO:0014724 | Meckel syndrome 8, MIM# 613885
+TCTN3	HGNC:24519	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 18, MIM# 614815 | MONDO:0013896 | Meckel-Gruber syndrome | Mohr-Majewski syndrome
+TFAP2A	HGNC:11742	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Branchiooculofacial syndrome, MIM# 113620
+TMEM138	HGNC:26944	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 16, MIM# 614465 | MONDO:0013764
+TMEM17	HGNC:26623	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Meckel syndrome MONDO:0018921, TMEM17-related
+TMEM216	HGNC:25018	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 2, MIM# 608091 | Meckel syndrome 2, MIM# 603194
+TMEM231	HGNC:37234	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 20, MIM# 614970 | MONDO:0013994 | MONDO:0014164 | Meckel syndrome 11, MIM# 615397
+TMEM237	HGNC:14432	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 14, MIM# 614424
+TMEM260	HGNC:20185	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Structural heart defects and renal anomalies syndrome, MIM# 617478
+TMEM67	HGNC:28396	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Joubert syndrome 6, MIM# 610688 | Meckel syndrome 3, MIM# 607361 | Nephronophthisis 11, MIM# 613550
+TNS2	HGNC:19737	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephrotic syndrome
+TOP2B	HGNC:11990	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	B-cell immunodeficiency, distal limb anomalies, and urogenital malformations, MIM# 609296
+TP53RK	HGNC:16197	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 4, MIM# 617730
+TPRKB	HGNC:24259	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 5, OMIM #617731
+TRAF3IP1	HGNC:17861	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	MONDO:0014712 | Senior-Loken syndrome 9, MIM# 616629
+TRAP1	HGNC:16264	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Syndromic disease, MONDO:0002254, TRAP1-related
+TRIM8	HGNC:15579	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Focal segmental glomerulosclerosis and neurodevelopmental syndrome, MIM# 619428 | Intellectual disability | Seizures | nephrotic syndrome | proteinuria
+TRPC6	HGNC:12338	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Glomerulosclerosis, focal segmental, 2, MIM# 603965
+TRPM6	HGNC:17995	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hypomagnesaemia 1, intestinal (MIM#602014)
+TRPM7	HGNC:17994	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Familial primary hypomagnesemia, MONDO:0018100, TRPM7-related
+TSC1	HGNC:12362	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Tuberous sclerosis-1, MIM#191100
+TSC2	HGNC:12363	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Tuberous sclerosis-2, MIM# 613254
+TSEN2	HGNC:28422	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	TRACK syndrome
+TTC21B	HGNC:25660	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Glomerular disorder (MONDO:0019722), TTC21B-related | Nephronophthisis 12, MIM# 613820 | Short-rib thoracic dysplasia 4 with or without polydactyly, MIM# 613819
+TTC8	HGNC:20087	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 8, MIM# 615985
+TTR	HGNC:12405	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	hereditary ATTR amyloidosis MONDO:0017132
+TULP3	HGNC:12425	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Hepatorenocardiac degenerative fibrosis, MIM# 619902
+TXNDC15	HGNC:20652	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Meckel syndrome 14, MIM# 619879
+UMOD	HGNC:12559	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63; 275:11.63	Autosomal Dominant Tubulointerstitial disease (ADTKD-UMOD) | Glomerulocystic kidney disease with hyperuricemia and isosthenuria 609886 | Hyperuricemic nephropathy, familial juvenile 1, MIM#	162000 | Medullary cystic kidney disease 2, MIM# 603860 | Tubulointerstitial kidney disease, autosomal dominant, 1, MIM# 162000
+VDR	HGNC:12679	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Rickets, vitamin D-resistant, type IIA, MIM# 277440
+VHL	HGNC:12687	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	von Hippel-Lindau syndrome, MIM#	193300
+VIPAS39	HGNC:20347	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Arthrogryposis, renal dysfunction, and cholestasis 2, MIM#613404
+VPS33B	HGNC:12712	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Arthrogryposis, renal dysfunction, and cholestasis 1 (MIM#208085)
+WBP11	HGNC:16461	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Vertebral, cardiac, tracheoesophageal, renal, and limb defects, MIM#	619227 | malformation syndrome affecting the cardiac, skeletal, gastrointestinal and renal systems
+WDPCP	HGNC:28027	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Bardet-Biedl syndrome 15, MIM# 615992 | Congenital heart defects, hamartomas of tongue, and polysyndactyly, 217085 | OFD
+WDR19	HGNC:18340	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis 13, MIM# 614377 | Senior-Loken syndrome 8, MIM# 616307
+WDR35	HGNC:29250	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Cranioectodermal dysplasia 2, MIM# 613610 | MONDO:0013569 | Short-rib thoracic dysplasia 7 with or without polydactyly, MIM#614091
+WDR4	HGNC:12756	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome 6, OMIM #618347
+WDR44	HGNC:30512	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	Ciliopathy, MONDO:0005308, WDR44-related
+WDR72	HGNC:26790	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Amelogenesis imperfecta, type IIA3, MIM# 613211 | Distal RTA
+WDR73	HGNC:25928	green	unknown	Unknown	Kidneyome_SuperPanel	275:11.63	
+WLS	HGNC:30238	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Zaki syndrome, MIM#619648
+WNK1	HGNC:14540	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Pseudohypoaldosteronism 2C (PHA2C), MIM#614492
+WNK4	HGNC:14544	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel; Kidneyome_SuperPanel	275:11.63; 275:11.63	Pseudohypoaldosteronism, type IIB, MIM# 614491
+WNT5A	HGNC:12784	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Robinow syndrome, autosomal dominant 1, MIM#180700
+WT1	HGNC:12796	green	AD	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted	Kidneyome_SuperPanel	275:11.63	Denys-Drash syndrome, MIM# 194080 | Frasier syndrome, MIM#136680 | Nephrotic syndrome, type 4, MIM#256370 | Wilms tumor, type 1, MIM#194070
+XDH	HGNC:12805	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Xanthinuria, type I (MIM#278300)
+XPNPEP3	HGNC:28052	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis-like nephropathy 1, OMIM #613159
+YRDC	HGNC:28905	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Galloway-Mowat syndrome
+ZIC3	HGNC:12874	green	XLR	X-LINKED: hemizygous mutation in males, biallelic mutations in females	Kidneyome_SuperPanel	275:11.63	VACTERL association, X-linked, MIM#314390
+ZMYM2	HGNC:12989	green	AD	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown	Kidneyome_SuperPanel	275:11.63	Neurodevelopmental-craniofacial syndrome with variable renal and cardiac abnormalities, MIM# 619522
+ZNF423	HGNC:16762	green	AR	BIALLELIC, autosomal or pseudoautosomal	Kidneyome_SuperPanel	275:11.63	Nephronophthisis 14, MIM# 614844
